@@ -1,91 +1,86 @@
-<style>
+
+<style lang="scss">
   @import "../styles/dark.theme.css";
-/* 
-html body {
-    font-family: 'Avenir', Helvetica, Arial, sans-serif;
-    -webkit-font-smoothing: antialiased;
-    -moz-osx-font-smoothing: grayscale;
-    color: #2c3e50;
-    background: #eee;
-} */
-    .layout{
-        border: 1px solid #d7dde4;
-        background: #f5f7f9;
-        position: relative;
-        border-radius: 4px;
-        overflow: hidden;
+    .layout {
+        display: flex;
+        flex-direction: column;
+        align-items: flex-start;
+        justify-content: flex-start;
+        // overflow: hidden;
     }
-    .layout-logo{
-        width: 100px;
-        height: 30px;
-        /* background: #5b6270; */
-        border-radius: 3px;
-        float: left;
-        position: relative;
-        top: 10px;
-        left: 20px;
-    }
-    .layout-logo a {
-        font-size: 20px;
-        font-weight: 900;
-        color: #f5f7f9;
-    }
-    .layout-header{
+    .layout-header {
+        position: fixed;
+        left: 0;
+        right: 0;
+        z-index: 1002;
+        display: flex;
+        width: 100%;
         height: 50px;
-        background: #193aa8;
-        box-shadow: 0 1px 1px rgba(0,0,0,.1);
+        flex-direction: row;
+        justify-content: flex-start;
+        align-items: center;
+        background-color: rgb(46, 47, 53);
+        .layout-trigger {
+            margin-left: 20px;
+        }
+        .layout-logo {
+            width: 100px;
+            height: 30px;
+            border-radius: 3px;
+            a {
+                font-size: 20px;
+                font-weight: 900;
+                color: #f5f7f9;
+            }
+        }
+        .layout-ceiling {
+            position: absolute;
+            right: 20px;
+            a {
+                font-size: 14px;
+                color: #f5f7f9;
+            }
+        }
     }
-    .layout-copy{
-        text-align: center;
-        padding: 10px 0 20px;
-        color: #9ea7b4;
-    }
-    .layout-ceiling{
-        /* background: #464c5b; */
-        padding: 10px 0;
+    .layout-content {
+        display: flex;
+        width: 100%;
+        height: 100%;
+        flex-direction: row;
+        justify-content: flex-start;
+        align-items: flex-start;
         overflow: hidden;
-    }
-    .layout-ceiling-main{
-        float: right;
-        margin-right: 15px;
-        margin-top: 5px;
-    }
-    .layout-ceiling-main a{
-        color: #9ba7b5;        
-        font-size: 14px;
-    }
-    .layout-trigger {
-        float: left;
-        margin-top: 10px;
-        margin-left: 10px;
-    }
-    .body.row {
-        top: 75px;
-        bottom: 0;
-        /* width: 200px; */
+        margin-top: 60px;
+        .left {
+            // overflow: hidden;
+            
+            width: 210px;
+            height: 100%;
+            position: fixed;
+            
+            .sideMenu {
+                // position: absolute;
+                // bottom: 0;
+                // top: 0;
+                overflow: auto;
+            }
+        }
+        .right {
+            display: inline-block;
+            padding-left: 15px;
+            padding-right: 15px;
+            padding-bottom: 15px;
+            padding-top: 0px;
+            width: 100%;
+            // left: 200px;
+            // position: relative;
+            overflow: auto;
+            margin-left: 210px;
+        }
     }
     .scroll-y {
         overflow-y: auto;
-        -webkit-overflow-scrolling: touch;  
-    }
-    .row, .col, .page {
-        overflow: hidden;
-        position: fixed;
-    }
-
-    .col {
-        top: 0;
-        bottom: 0;
-    }
-    .left.col {
-        width: 200px;
-        padding: 0;
-        /* margin-top: 50px; */
-    }
-    .right.col {
-        top: 50px;
-        left: 200px;
-        right: 0;
+        -webkit-overflow-scrolling: touch;
     }
 </style>
 <template>
@@ -100,25 +95,24 @@ html body {
 
             <div class="layout-ceiling">
                 <div class="layout-ceiling-main">
-                    <a href="#">注销</a>
+                    <a @click="logout()">注销</a>
                 </div>
             </div>
         </div>
 
-        <div class="left col" :style="{width: hideSidebarText?'60px':'200px'}">
-            
-            <div class="body row scroll-y" style="top:50px" :style="{width: hideSidebarText?'60px':'200px'}">
-                <sidebar :hide-sidebar-text="hideSidebarText" theme="dark"></sidebar>
+        <div class="layout-content">
+            <div class="left" :style="{width: hideSidebarText?'60px':'200px'}">
+                <div class="sideMenu scroll-y" :style="{width: hideSidebarText?'60px':'200px'}">
+                    <sidebar :hide-sidebar-text="hideSidebarText" theme="light"></sidebar>
+                </div>
             </div>
-        </div>
-        
-        <div  class="right col body" :style="{left: hideSidebarText?'60px':'200px'}">
-            <div class="body row scroll-y" style="padding: 1em">
-                <router-view></router-view>
+
+            <div  class="right" :style="{left: hideSidebarText?'60px':'200px'}">
+                <div class="content scroll-y" style="padding: 1em; width: 100%">
+                    <router-view></router-view>
+          
+                </div>
             </div>
-            <!--<div class="footer row">-->
-            <!--Some status text here-->
-            <!--</div>-->
         </div>
     </div>
 </template>
@@ -127,13 +121,22 @@ html body {
 import sidebar from '../components/layout/sidebar.vue'
 export default {
     components: {
-        sidebar,
+        sidebar
     },
     data () {
       return {
-        hideSidebarText: false,
-      
+        hideSidebarText: false
       }
     },
+    methods: {
+        logout() {
+            this.$store.dispatch('logout').then(() => {
+            this.$Message.success('注销成功')
+            this.$router.push({
+              path: '/login'
+            })
+          })
+        }
+    }
 }
 </script>

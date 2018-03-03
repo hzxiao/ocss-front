@@ -1,7 +1,7 @@
 import httpUtil from '../utils/httpUtil'
 
 export default {
-    url: '/user',
+    url: '/student/',
     list(params) {
         let options = httpUtil.createQueryOption(params);
         return httpUtil.fetch({
@@ -51,7 +51,7 @@ export default {
     },
     login(data) {
         return httpUtil.fetch({
-            url: this.url + '/login',
+            url: '/login',
             method: 'post',
             data
         })

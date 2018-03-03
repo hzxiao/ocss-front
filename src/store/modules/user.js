@@ -35,6 +35,7 @@ const mutations = {
             state.userId = user.userId;
             storage.state.storage.setItem('userId', user.userId);
             state.token = user.token;
+            state.role = user.role;
         }
     },
     [types.SET_USER_TOKEN]: (state, token) => {
@@ -45,6 +46,7 @@ const mutations = {
     [types.CLEAR_USER]: (state) => {
         state.userDetail = {}
         state.userId = null
+        state.token = null
         localStorage.clear()
         sessionStorage.clear()
     }

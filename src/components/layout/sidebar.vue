@@ -50,7 +50,7 @@
 	    text-align: center;
     }
      h5 {
-        color: #f2f2f2;
+        color: #292626;
         font-weight: 700;
         font-size: 14px;
         margin-top: 10px;

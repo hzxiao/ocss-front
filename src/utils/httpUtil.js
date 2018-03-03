@@ -2,14 +2,15 @@ import axios from 'axios';
 import Notice from 'iview/src/components/notice';
 import store from '../store'
 
-axios.defaults.baseURL = `http://111.230.242.177:8089/ocss/`
+axios.defaults.baseURL = `http://111.230.243.27:8080/ocss/`
 
 // http request 拦截器
 axios.interceptors.request.use(
     config => {
+        config.headers['Content-Type'] = 'application/json'
         if (store.getters.token) {
+            console.log(store.getters.token)
             config.headers['Authorization'] = `Bearer ${store.getters.token}`;
-            config.headers['Content-Type'] = 'application/json'
         }
         return config;
     },

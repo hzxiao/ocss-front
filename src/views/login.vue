@@ -1,71 +1,89 @@
+<style lang="less">
+    @import './login.less';
+</style>
+
 <template>
-    <Form ref="formInline" :model="formInline" :rules="ruleInline" inline>
-        <FormItem prop="user">
-            <Input type="text" v-model="formInline.user" placeholder="Username">
-            <Icon type="ios-person-outline" slot="prepend"></Icon>
-            </Input>
-        </FormItem>
-        <FormItem prop="password">
-            <Input type="password" v-model="formInline.password" placeholder="Password">
-            <Icon type="ios-locked-outline" slot="prepend"></Icon>
-            </Input>
-        </FormItem>
-        <FormItem>
-            <Button type="primary" @click="handleSubmit('formInline')">Signin</Button>
-        </FormItem>
-    </Form>
+    <div class="login" @keydown.enter="handleSubmit">
+        <div class="login-con">
+            <Card :bordered="false">
+                <p slot="title">
+                    <Icon type="log-in"></Icon>
+                    欢迎登录
+                </p>
+                <div class="form-con">
+                    <Form ref="loginForm" :model="form" :rules="rules">
+                        <FormItem prop="userName">
+                            <Input v-model="form.username" placeholder="请输入用户名">
+                                <span slot="prepend">
+                                    <Icon :size="16" type="person"></Icon>
+                                </span>
+                            </Input>
+                        </FormItem>
+                        <FormItem prop="password">
+                            <Input type="password" v-model="form.password" placeholder="请输入密码">
+                                <span slot="prepend">
+                                    <Icon :size="14" type="locked"></Icon>
+                                </span>
+                            </Input>
+                        </FormItem>
+                        <FormItem>
+                            <Button @click="handleSubmit" type="primary" long>登录</Button>
+                        </FormItem>
+                    </Form>
+                </div>
+            </Card>
+        </div>
+    </div>
 </template>
 
 <script>
-import user from "../api/user.api";
+import user from '../api/user.api'
+import store from '../store'
+
 export default {
-  data() {
-    return {
-      formInline: {
-        user: "",
-        password: ""
-      },
-      ruleInline: {
-        user: [
-          {
-            required: true,
-            message: "Please fill in the user name",
-            trigger: "blur"
-          }
-        ],
-        password: [
-          {
-            required: true,
-            message: "Please fill in the password.",
-            trigger: "blur"
-          },
-          {
-            type: "string",
-            min: 6,
-            message: "The password length cannot be less than 6 bits",
-            trigger: "blur"
-          }
-        ]
-      }
-    };
-  },
-  methods: {
-    handleSubmit(name) {
-      this.$refs[name].validate(valid => {
-        user.login(this.formInline)
-          .then(res => {
-            this.$Message.success("Success!");
-            //   this.handleLoginSuccess(res)
+    data () {
+        return {
+            form: {
+                username: '',
+                password: ''
+            },
+            rules: {
+                username: [
+                    { required: true, message: '账号不能为空', trigger: 'blur' }
+                ],
+                password: [
+                    { required: true, message: '密码不能为空', trigger: 'blur' }
+                ]
+            }
+        };
+    },
+    methods: {
+        handleSubmit () {
+            this.$refs.loginForm.validate((valid) => {
+                if (valid) {
+                  user.login(this.form)
+                  .then(res => {
+                    let body = res.data
+                    if (body.code == this.$code.SUCCESS) {
+                      this.handleLoginSuccess(body);
+                    } else {
+                      this.$Message.error(body.msg);
+                    }
+                  })
+                  .catch(error => {
+                    this.$Message.error("Fail!");
+                  });
+                }
+            });
+        },
+        handleLoginSuccess: function (res) {
+          this.$store.dispatch('initUser', res.data.user).then(() => {
+            this.$Message.success('登录成功')
+            this.$router.push({
+              path: '/'
+            })
           })
-          .catch(error => {
-            //   this.handleLoginError(error)
-            this.$Message.error("Fail!");
-          });
-        if (valid) {
-        } else {
-        }
-      });
+      },
     }
-  }
 };
 </script>

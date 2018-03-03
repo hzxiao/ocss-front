@@ -8,6 +8,7 @@ import iView from 'iview';
 import 'iview/dist/styles/iview.css';
 import Vuex from 'vuex';
 import store from './store'
+import Code from "./common/code"
 
 
 Vue.config.productionTip = false
@@ -15,6 +16,7 @@ Vue.config.productionTip = false
 Vue.use(iView);
 Vue.use(Vuex);
 
+Vue.prototype.$code = Code.CodeInit();
 /* eslint-disable no-new */
 new Vue({
     el: '#app',
