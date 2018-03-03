@@ -2,7 +2,7 @@ import axios from 'axios';
 import Notice from 'iview/src/components/notice';
 import store from '../store'
 
-axios.defaults.baseURL = `http://111.230.243.27:8080/ocss/`
+axios.defaults.baseURL = `http://111.230.242.177:8999`
 
 // http request 拦截器
 axios.interceptors.request.use(
