@@ -1,6 +1,6 @@
 
 <style lang="scss">
-  @import "../styles/dark.theme.css";
+	@import "../styles/dark.theme.css";
     .layout {
         display: flex;
         flex-direction: column;
@@ -19,7 +19,7 @@
         flex-direction: row;
         justify-content: flex-start;
         align-items: center;
-        background-color: rgb(46, 47, 53);
+        background-color: #637a91;
         .layout-trigger {
             margin-left: 20px;
         }
@@ -33,6 +33,11 @@
                 color: #f5f7f9;
             }
         }
+		.layout-breadcrumb {
+			* > * {
+				color: white;
+			}
+		}
         .layout-ceiling {
             position: absolute;
             right: 20px;
@@ -53,15 +58,9 @@
         margin-top: 60px;
         .left {
             // overflow: hidden;
-            
             width: 210px;
             height: 100%;
-            position: fixed;
-            
             .sideMenu {
-                // position: absolute;
-                // bottom: 0;
-                // top: 0;
                 overflow: auto;
             }
         }
@@ -72,10 +71,7 @@
             padding-bottom: 15px;
             padding-top: 0px;
             width: 100%;
-            // left: 200px;
-            // position: relative;
             overflow: auto;
-            margin-left: 210px;
         }
     }
     .scroll-y {
@@ -86,12 +82,16 @@
 <template>
     <div class="layout">
         <div class="layout-header">
-            <span class="layout-trigger">
+            <span class="layout-trigger" @click="showMenu = !showMenu">
                 <Icon type="navicon" size="30" color="white"></Icon>
             </span>
             <div class="layout-logo">
                 <a href="#">OCSS</a>
             </div>
+
+			<div class="layout-breadcrumb">
+				<breadcrumb-nav :currentPath="currentPath"></breadcrumb-nav>
+			</div>
 
             <div class="layout-ceiling">
                 <div class="layout-ceiling-main">
@@ -101,41 +101,53 @@
         </div>
 
         <div class="layout-content">
-            <div class="left" :style="{width: hideSidebarText?'60px':'200px'}">
-                <div class="sideMenu scroll-y" :style="{width: hideSidebarText?'60px':'200px'}">
-                    <sidebar :hide-sidebar-text="hideSidebarText" theme="light"></sidebar>
+            <div class="left" v-if="showMenu">
+                <div class="sideMenu scroll-y">
+                    <shrinkable-menu>
+						<div slot="top">
+							<p class="centered"></p>
+							<a href="profile.html"><img src="static/img/ui-sam.jpg" class="img-circle" width="60"></a>
+							<h5 class="centered">Marcel Newman</h5>
+						</div>
+					</shrinkable-menu>
                 </div>
             </div>
 
-            <div  class="right" :style="{left: hideSidebarText?'60px':'200px'}">
-                <div class="content scroll-y" style="padding: 1em; width: 100%">
+            <div  class="right">
+                <div class="content scroll-y">
                     <router-view></router-view>
-          
                 </div>
             </div>
         </div>
     </div>
 </template>
 <script>
+import shrinkableMenu from '@/components/shrinkable-menu'
+import breadcrumbNav from '@/components/breadcrumb-nav'
 
-import sidebar from '../components/layout/sidebar.vue'
 export default {
     components: {
-        sidebar
+		breadcrumbNav,
+		shrinkableMenu
     },
     data () {
-      return {
-        hideSidebarText: false
-      }
+        return {
+			showMenu: true
+        }
     },
+	computed: {
+    	currentPath () {
+    		return this.$store.state.layout.currentPath
+		}
+	},
     methods: {
-        logout() {
+        logout () {
             this.$store.dispatch('logout').then(() => {
-            this.$Message.success('注销成功')
-            this.$router.push({
-              path: '/login'
+                this.$Message.success('注销成功')
+                this.$router.push({
+                    path: '/login'
+                })
             })
-          })
         }
     }
 }

@@ -2,61 +2,61 @@ import httpUtil from '../utils/httpUtil'
 
 export default {
     url: '/users',
-    list(params) {
-        let options = httpUtil.createQueryOption(params);
+    list (params) {
+        let options = httpUtil.createQueryOption(params)
         return httpUtil.fetch({
             url: this.url + 'all' + options,
             method: 'get'
-        });
+        })
     },
-    fetchData(params) {
-        let options = httpUtil.createQueryOption(params);
+    fetchData (params) {
+        let options = httpUtil.createQueryOption(params)
         return httpUtil.fetch({
             url: this.url + 'all' + options,
             method: 'get'
-        });
+        })
     },
-    create(data) {
+    create (data) {
         return httpUtil.fetch({
             url: `${this.url}/register`,
             method: 'post',
             data
-        });
+        })
     },
-    update(data) {
+    update (data) {
         return httpUtil.fetch({
             url: this.url,
             method: 'put',
             data
-        });
+        })
     },
-    find(id) {
+    find (id) {
         return httpUtil.fetch({
             url: this.url + encodeURIComponent(id),
             method: 'get'
-        });
+        })
     },
-    delete(id) {
+    delete (id) {
         return httpUtil.fetch({
             url: `${this.url}/delete/${id}`,
             method: 'delete'
-        });
+        })
     },
-    advancedSearch(searchStr, params) {
-        let options = httpUtil.createQueryOption(params);
+    advancedSearch (searchStr, params) {
+        let options = httpUtil.createQueryOption(params)
         return httpUtil.fetch({
             url: this.url + 'adv/' + encodeURIComponent(searchStr) + options,
             method: 'get'
-        });
+        })
     },
-    login(data) {
+    login (data) {
         return httpUtil.fetch({
             url: '/login',
             method: 'post',
             data
         })
     },
-    getUserInfo() {
+    getUserInfo () {
         return httpUtil.fetch({
             url: '/account',
             method: 'get'

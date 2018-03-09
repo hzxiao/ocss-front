@@ -26,20 +26,20 @@
                         <Radio label="female">女</Radio>
                     </RadioGroup>
                 </FormItem>
-                
+
                 <FormItem label="身份证" prop="credit">
                     <Input v-model="formValidate.credit" placeholder="输入学生身份证号码"></Input>
                 </FormItem>
 
-                
+
                 <FormItem label="手机" prop="phone">
                     <Input v-model="formValidate.phone" placeholder="输入手机号码"></Input>
                 </FormItem>
             </div>
             <div class="right-side">
-            <FormItem label="邮箱" prop="email">
-                <Input v-model="formValidate.email" placeholder="输入邮箱"></Input>
-            </FormItem>
+                <FormItem label="邮箱" prop="email">
+                    <Input v-model="formValidate.email" placeholder="输入邮箱"></Input>
+                </FormItem>
             <FormItem label="学院" prop="department">
                 <Select v-model="formValidate.department" placeholder="选择所在学院">
                     <Option value="beijing">New York</Option>
@@ -54,25 +54,25 @@
                     <Option value="shenzhen">Sydney</Option>
                 </Select>
             </FormItem>
-            <FormItem label="年级" prop="school_year">
-                <Select v-model="formValidate.school_year" placeholder="选择年级">
+            <FormItem label="年级" prop="degree">
+                <Select v-model="formValidate.degree" placeholder="选择年级">
                     <Option value="beijing">New York</Option>
                     <Option value="shanghai">London</Option>
                     <Option value="shenzhen">Sydney</Option>
                 </Select>
             </FormItem>
             <FormItem label="班级" prop="classes">
-                <Select v-model="formValidate.classes" placeholder="选择班级">
+                <Select v-model="formValidate.class" placeholder="选择班级">
                     <Option value="beijing">New York</Option>
                     <Option value="shanghai">London</Option>
                     <Option value="shenzhen">Sydney</Option>
                 </Select>
             </FormItem>
         </div>
-        
-     
+
+
         </div>
-        
+
             <FormItem class="btn">
                 <Button type="primary" @click="handleSubmit('formValidate')">Submit</Button>
                 <Button type="ghost" @click="handleReset('formValidate')" style="margin-left: 8px">Reset</Button>
@@ -133,8 +133,8 @@ Form {
                     phone: '',
                     department: '',
                     major: '',
-                    school_year: '',
-                    classes: ''
+                    degree: '',
+                    class: ''
                 },
                 ruleValidate: {
                     student_id: [
@@ -158,10 +158,10 @@ Form {
                     major: [
                         { required: true, message: '请选择专业', trigger: 'change' }
                     ],
-                    school_year: [
+                    degree: [
                         { required: true, message: '请选择所在年级', trigger: 'change' }
                     ],
-                    classes: [
+                    class: [
                         { required: true, message: '请选择所在班级', trigger: 'change' }
                     ]
                 }
@@ -171,9 +171,9 @@ Form {
             handleSubmit (name) {
                 this.$refs[name].validate((valid) => {
                     if (valid) {
-                        this.$Message.success('Success!');
+                        this.$Message.success('Success!')
                     } else {
-                        this.$Message.error('Fail!');
+                        this.$Message.error('Fail!')
                     }
                 })
             },

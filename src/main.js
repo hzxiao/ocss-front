@@ -9,9 +9,13 @@ import 'iview/dist/styles/iview.css';
 import Vuex from 'vuex';
 import store from './store'
 import Code from "./common/code"
+import { sync } from 'vuex-router-sync'
 
 
 Vue.config.productionTip = false
+Vue.config.devtools = true
+
+const unsync = sync(store, router)
 
 Vue.use(iView);
 Vue.use(Vuex);

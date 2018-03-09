@@ -3,7 +3,9 @@ import { adminRouter } from '../../router'
 
 const state = {
     adminMenuList: [],
-    currentPath: [], // 面包屑数组
+    currentPath: [
+		{ title: '首页', path: '', name: 'Home' }
+	], // 面包屑数组
     menuTheme: null, // 主题
     theme: null
 }
