@@ -81,7 +81,7 @@ export const appRouter = [
         icon: 'lock-combination',
         title: '权限测试页',
         name: 'accesstest',
-        access: 0,
+        access: 1,
         component: Main,
         children: [
             { path: 'index', title: '权限测试页', name: 'accesstest_index', access: 0, component: () => import('@/views/access/access-test.vue') }
@@ -93,6 +93,7 @@ export const appRouter = [
         title: {i18n: 'international'},
         name: 'international',
         component: Main,
+        access: 3,
         children: [
             { path: 'index', title: {i18n: 'international'}, name: 'international_index', component: () => import('@/views/international/international.vue') }
         ]

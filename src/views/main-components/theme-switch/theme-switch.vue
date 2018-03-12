@@ -87,7 +87,7 @@ export default {
                 let themeList = JSON.parse(localStorage.theme);
                 let index = 0;
                 let hasThisUser = themeList.some((item, i) => {
-                    if (item.userName === userName) {
+                    if (item.username === userName) {
                         index = i;
                         return true;
                     } else {
@@ -99,7 +99,7 @@ export default {
                     themeList[index].menuTheme = menuTheme;
                 } else {
                     themeList.push({
-                        userName: userName,
+                        username: userName,
                         mainTheme: mainTheme,
                         menuTheme: menuTheme
                     });
@@ -107,7 +107,7 @@ export default {
                 localStorage.theme = JSON.stringify(themeList);
             } else {
                 localStorage.theme = JSON.stringify([{
-                    userName: userName,
+                    username: userName,
                     mainTheme: mainTheme,
                     menuTheme: menuTheme
                 }]);
@@ -136,7 +136,7 @@ export default {
         let name = Cookies.get('user');
         if (localStorage.theme) {
             let hasThisUser = JSON.parse(localStorage.theme).some(item => {
-                if (item.userName === name) {
+                if (item.username === name) {
                     this.$store.commit('changeMenuTheme', item.menuTheme);
                     this.$store.commit('changeMainTheme', item.mainTheme);
                     return true;

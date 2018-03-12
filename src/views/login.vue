@@ -12,8 +12,8 @@
                 </p>
                 <div class="form-con">
                     <Form ref="loginForm" :model="form" :rules="rules">
-                        <FormItem prop="userName">
-                            <Input v-model="form.userName" placeholder="请输入用户名">
+                        <FormItem prop="username">
+                            <Input v-model="form.username" placeholder="请输入用户名">
                                 <span slot="prepend">
                                     <Icon :size="16" type="person"></Icon>
                                 </span>
@@ -39,15 +39,17 @@
 
 <script>
 import Cookies from 'js-cookie';
+import { UserApi } from '../api'
+
 export default {
     data () {
         return {
             form: {
-                userName: 'iview_admin',
+                username: '',
                 password: ''
             },
             rules: {
-                userName: [
+                username: [
                     { required: true, message: '账号不能为空', trigger: 'blur' }
                 ],
                 password: [
@@ -60,18 +62,32 @@ export default {
         handleSubmit () {
             this.$refs.loginForm.validate((valid) => {
                 if (valid) {
-                    Cookies.set('user', this.form.userName);
-                    Cookies.set('password', this.form.password);
-                    this.$store.commit('setAvator', 'https://ss1.bdstatic.com/70cFvXSh_Q1YnxGkpoWK1HF6hhy/it/u=3448484253,3685836170&fm=27&gp=0.jpg');
-                    if (this.form.userName === 'iview_admin') {
-                        Cookies.set('access', 0);
-                    } else {
-                        Cookies.set('access', 1);
-                    }
-                    this.$router.push({
-                        name: 'home_index'
-                    });
+                    UserApi.login(this.form)
+                        .then(({ data }) => {
+                            if (data.code === this.$code.SUCCESS)
+                                return this.handleSuccess(data.data)
+                            return this.$Message.error(data.msg)
+                        })
                 }
+            })
+        },
+
+        handleSuccess (data) {
+            Cookies.set('user', this.form.username);
+            Cookies.set('password', this.form.password);
+            console.log(data)
+            this.$store.dispatch('login', data)
+
+            this.$store.commit('setAvator', 'https://ss1.bdstatic.com/70cFvXSh_Q1YnxGkpoWK1HF6hhy/it/u=3448484253,3685836170&fm=27&gp=0.jpg');
+
+            if (this.form.username === 'iview_admin') {
+
+                Cookies.set('access', 0);
+            } else {
+                Cookies.set('access', 1);
+            }
+            this.$router.push({
+                name: 'home_index'
             });
         }
     }

@@ -8,9 +8,24 @@ import '@/locale';
 import 'iview/dist/styles/iview.css';
 import VueI18n from 'vue-i18n';
 import util from './libs/util';
+import Code from './libs/code'
 
 Vue.use(VueI18n);
 Vue.use(iView);
+
+/**
+ * Using the defineProperty
+ * = means default
+ * This is the descriptor property
+ *  - configurable = false make it can't be deleted or the descriptor unchangeable
+ *  - enumerable = false make it unenumerable which can't be iterate through the for loop
+ *  - writable = false make it unchangeable by = assignment
+ * For more detail click the @link below
+ * https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object/defineProperty
+ **/
+Object.defineProperty(Vue.prototype, '$code', {
+    value: Code.CodeInit()
+})
 
 new Vue({
     el: '#app',
