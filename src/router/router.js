@@ -115,6 +115,21 @@ export const appRouter = [{
         }]
     },
     {
+        path: '/course_management',
+        icon: 'ios-book',
+        name: 'course-management',
+        title: '课程管理',
+        component: Main,
+        children: [
+            {
+                path: 'index',
+                title: '课程管理',
+                name: 'course-management_index',
+                component: () => import('@/views/course-management/course-management.vue')
+            },
+        ]
+    },
+    {
         path: '/access-test',
         icon: 'lock-combination',
         title: '权限测试页',
