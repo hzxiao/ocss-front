@@ -24,7 +24,7 @@ const user = {
             }
         },
 
-        logout (state) {
+        logout(state) {
             state.userDetail = {}
             state.userId = null
             state.token = null
@@ -34,6 +34,8 @@ const user = {
             Cookies.remove('user');
             Cookies.remove('password');
             Cookies.remove('access');
+            Cookies.remove('token');
+            Cookies.remove('role');
             // 恢复默认样式
             let themeLink = document.querySelector('link[name="theme"]');
             themeLink.setAttribute('href', '');
@@ -49,16 +51,16 @@ const user = {
         }
     },
     getters: {
-        token ({ token }) {
+        token({ token }) {
             return JSON.parse(sessionStorage.getItem('token')) || token
         }
     },
     actions: {
-        login ({ _, commit }, data) {
+        login({ _, commit }, data) {
             console.log(data)
             commit(types.SET_USER, data.user)
         },
-        logout ({ _, commit }) {
+        logout({ _, commit }) {
             commit(types.CLEAR_USER)
         }
     }

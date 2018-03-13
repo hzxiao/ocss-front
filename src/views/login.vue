@@ -39,7 +39,7 @@
 
 <script>
 import Cookies from 'js-cookie';
-import { UserApi } from '../api'
+import { UserApi } from '../api' 
 
 export default {
     data () {
@@ -75,6 +75,8 @@ export default {
         handleSuccess (data) {
             Cookies.set('user', this.form.username);
             Cookies.set('password', this.form.password);
+            Cookies.set('token', data.user.token);
+            Cookies.set('role', data.user.role);
             console.log(data)
             this.$store.dispatch('login', data)
 
