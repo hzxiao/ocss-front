@@ -1,11 +1,11 @@
 import httpUtil from '../libs/httpUtil'
 
 export default {
-    url: '/student/',
+    url: '/students/',
     list(params) {
         let options = httpUtil.createQueryOption(params)
         return httpUtil.fetch({
-            url: this.url + 'all' + options,
+            url: this.url + options,
             method: 'get'
         })
     },

@@ -1,17 +1,20 @@
 import axios from 'axios'
 import Notice from 'iview/src/components/notice'
 import store from '../store'
+import Cookies from 'js-cookie';
+
 
 axios.defaults.baseURL = `http://111.230.242.177:8999`
-
-// http request 拦截器
+    // axios.defaults.baseURL = `http://localhost:8999`
+    // http request 拦截器
 axios.interceptors.request.use(
     config => {
         config.headers['Content-Type'] = 'application/json'
-        if (store.getters.token) {
-            console.log(store.getters.token)
-            config.headers['Authorization'] = `Bearer ${store.getters.token}`
-        }
+            // if (store.getters.token) {
+        console.log(store.getters.token)
+        config.headers['Authorization'] = `Bearer ${Cookies.get('token')}`
+            // }
+        console.log(config.headers)
         return config
     },
     err => {
@@ -26,40 +29,40 @@ axios.interceptors.response.use(
     error => {
         if (error.response) {
             switch (error.response.status) {
-            case 400:
-                if (error.response && error.response.data && error.response.data.message) {
+                case 400:
+                    if (error.response && error.response.data && error.response.data.message) {
+                        Notice.error({
+                            title: error.response.data.message,
+                            duration: 5,
+                            closable: true
+                        })
+                    }
+                    break
+                case 401:
+                    // 401 清除token信息
+                    store.dispatch('logout')
+                    break
+                case 403:
                     Notice.error({
-                        title: error.response.data.message,
+                        title: '没有操作权限',
                         duration: 5,
                         closable: true
                     })
-                }
-                break
-            case 401:
-                    // 401 清除token信息
-                store.dispatch('logout')
-                break
-            case 403:
-                Notice.error({
-                    title: '没有操作权限',
-                    duration: 5,
-                    closable: true
-                })
-                break
-            case 404:
-                Notice.error({
-                    title: '找不到',
-                    duration: 5,
-                    closable: true
-                })
-                break
-            case 500:
-                Notice.error({
-                    title: '服务器出了小问题',
-                    duration: 5,
-                    closable: true
-                })
-                break
+                    break
+                case 404:
+                    Notice.error({
+                        title: '找不到',
+                        duration: 5,
+                        closable: true
+                    })
+                    break
+                case 500:
+                    Notice.error({
+                        title: '服务器出了小问题',
+                        duration: 5,
+                        closable: true
+                    })
+                    break
             }
         }
         return Promise.reject(error)
@@ -67,7 +70,7 @@ axios.interceptors.response.use(
 
 const httpUtil = {
     fetch: axios,
-    cleanArray: function (actual) {
+    cleanArray: function(actual) {
         const newArray = []
         for (let i = 0; i < actual.length; i++) {
             if (actual[i]) {
@@ -76,7 +79,7 @@ const httpUtil = {
         }
         return newArray
     },
-    createRequestOption: function (params) {
+    createRequestOption: function(params) {
         if (!params || params === 'undefined' || params === undefined) return ''
         return this.cleanArray(Object.keys(params).map(key => {
             if (!params[key] || params[key] === undefined || params[key] === 'undefined') return ''
@@ -88,17 +91,17 @@ const httpUtil = {
                 encodeURIComponent(params[key])
         })).join('&')
     },
-    createQueryOption: function (params) {
+    createQueryOption: function(params) {
         if (!params) {
             return ''
         }
         let options = '?'
 
-        let { page, size, sortWay } = params
+        let { page, pageSize, sortWay, } = params
 
-        if (page && size) {
+        if (page && pageSize) {
             page--
-            options = options + 'page=' + parseInt(page, 10) + '&size=' + parseInt(size, 10)
+            options = options + 'page=' + parseInt(page, 10) + '&pageSize=' + parseInt(size, 10)
         }
 
         let sort = null
@@ -120,7 +123,7 @@ const httpUtil = {
         }
         return options
     },
-    createSearchOption: function (params) {
+    createSearchOption: function(params) {
         let options = '?'
 
         let { page, size, sortWay } = params
