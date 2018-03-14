@@ -120,14 +120,13 @@ export const appRouter = [{
         name: 'course-management',
         title: '课程管理',
         component: Main,
-        children: [
-            {
-                path: 'index',
-                title: '课程管理',
-                name: 'course-management_index',
-                component: () => import('@/views/course-management/course-management.vue')
-            },
-        ]
+        children: [{
+            path: 'index',
+            title: '课程管理',
+            name: 'course-management_index',
+            component: () =>
+                import ('@/views/course-management/course-management.vue')
+        }, ]
     },
     {
         path: '/access-test',
@@ -370,14 +369,14 @@ export const appRouter = [{
                 title: '学生列表',
                 name: 'list-student',
                 component: () =>
-                    import ('@/views/abstract.vue')
+                    import ('@/views/manage-student/list-student.vue')
             },
             {
                 path: 'addStudent',
                 title: '添加学生',
                 name: 'add-student',
                 component: () =>
-                    import ('@/views/abstract.vue')
+                    import ('@/views/manage-student/add-student.vue')
             }
         ]
     },

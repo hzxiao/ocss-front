@@ -6,23 +6,23 @@ import packjson from '../../package.json';
 let util = {
 
 };
-util.title = function (title) {
+util.title = function(title) {
     title = title || 'iView admin';
     window.document.title = title;
 };
 
-const ajaxUrl = env === 'development'
-    ? 'http://127.0.0.1:8888'
-    : env === 'production'
-        ? 'https://www.url.com'
-        : 'https://debug.url.com';
+const ajaxUrl = env === 'development' ?
+    'http://127.0.0.1:8888' :
+    env === 'production' ?
+    'https://www.url.com' :
+    'https://debug.url.com';
 
 util.ajax = axios.create({
     baseURL: ajaxUrl,
     timeout: 30000
 });
 
-util.inOf = function (arr, targetArr) {
+util.inOf = function(arr, targetArr) {
     let res = true;
     arr.forEach(item => {
         if (targetArr.indexOf(item) < 0) {
@@ -32,7 +32,7 @@ util.inOf = function (arr, targetArr) {
     return res;
 };
 
-util.oneOf = function (ele, targetArr) {
+util.oneOf = function(ele, targetArr) {
     if (targetArr.indexOf(ele) >= 0) {
         return true;
     } else {
@@ -40,7 +40,7 @@ util.oneOf = function (ele, targetArr) {
     }
 };
 
-util.showThisRoute = function (itAccess, currentAccess) {
+util.showThisRoute = function(itAccess, currentAccess) {
     if (typeof itAccess === 'object' && Array.isArray(itAccess)) {
         return util.oneOf(currentAccess, itAccess);
     } else {
@@ -48,7 +48,7 @@ util.showThisRoute = function (itAccess, currentAccess) {
     }
 };
 
-util.getRouterObjByName = function (routers, name) {
+util.getRouterObjByName = function(routers, name) {
     if (!name || !routers || !routers.length) {
         return null;
     }
@@ -66,7 +66,7 @@ util.getRouterObjByName = function (routers, name) {
     return null;
 };
 
-util.handleTitle = function (vm, item) {
+util.handleTitle = function(vm, item) {
     if (typeof item.title === 'object') {
         return vm.$t(item.title.i18n);
     } else {
@@ -74,7 +74,7 @@ util.handleTitle = function (vm, item) {
     }
 };
 
-util.setCurrentPath = function (vm, name) {
+util.setCurrentPath = function(vm, name) {
     let title = '';
     let isOtherRouter = false;
     vm.$store.state.app.routers.forEach(item => {
@@ -98,16 +98,13 @@ util.setCurrentPath = function (vm, name) {
     });
     let currentPathArr = [];
     if (name === 'home_index') {
-        currentPathArr = [
-            {
-                title: util.handleTitle(vm, util.getRouterObjByName(vm.$store.state.app.routers, 'home_index')),
-                path: '',
-                name: 'home_index'
-            }
-        ];
+        currentPathArr = [{
+            title: util.handleTitle(vm, util.getRouterObjByName(vm.$store.state.app.routers, 'home_index')),
+            path: '',
+            name: 'home_index'
+        }];
     } else if ((name.indexOf('_index') >= 0 || isOtherRouter) && name !== 'home_index') {
-        currentPathArr = [
-            {
+        currentPathArr = [{
                 title: util.handleTitle(vm, util.getRouterObjByName(vm.$store.state.app.routers, 'home_index')),
                 path: '/home',
                 name: 'home_index'
@@ -136,16 +133,13 @@ util.setCurrentPath = function (vm, name) {
             }
         })[0];
         if (currentPathObj.children.length <= 1 && currentPathObj.name === 'home') {
-            currentPathArr = [
-                {
-                    title: '首页',
-                    path: '',
-                    name: 'home_index'
-                }
-            ];
+            currentPathArr = [{
+                title: '首页',
+                path: '',
+                name: 'home_index'
+            }];
         } else if (currentPathObj.children.length <= 1 && currentPathObj.name !== 'home') {
-            currentPathArr = [
-                {
+            currentPathArr = [{
                     title: '首页',
                     path: '/home',
                     name: 'home_index'
@@ -160,8 +154,7 @@ util.setCurrentPath = function (vm, name) {
             let childObj = currentPathObj.children.filter((child) => {
                 return child.name === name;
             })[0];
-            currentPathArr = [
-                {
+            currentPathArr = [{
                     title: '首页',
                     path: '/home',
                     name: 'home_index'
@@ -184,7 +177,7 @@ util.setCurrentPath = function (vm, name) {
     return currentPathArr;
 };
 
-util.openNewPage = function (vm, name, argu, query) {
+util.openNewPage = function(vm, name, argu, query) {
     let pageOpenedList = vm.$store.state.app.pageOpenedList;
     let openedPageLen = pageOpenedList.length;
     let i = 0;
@@ -224,7 +217,7 @@ util.openNewPage = function (vm, name, argu, query) {
     vm.$store.commit('setCurrentPageName', name);
 };
 
-util.toDefaultPage = function (routers, name, route, next) {
+util.toDefaultPage = function(routers, name, route, next) {
     let len = routers.length;
     let i = 0;
     let notHandle = true;
@@ -244,14 +237,14 @@ util.toDefaultPage = function (routers, name, route, next) {
     }
 };
 
-util.fullscreenEvent = function (vm) {
+util.fullscreenEvent = function(vm) {
     vm.$store.commit('initCachepage');
     // 权限菜单过滤相关
     vm.$store.commit('updateMenulist');
     // 全屏相关
 };
 
-util.checkUpdate = function (vm) {
+util.checkUpdate = function(vm) {
     axios.get('https://api.github.com/repos/iview/iview-admin/releases/latest').then(res => {
         let version = res.data.tag_name;
         vm.$Notice.config({
@@ -265,5 +258,23 @@ util.checkUpdate = function (vm) {
         }
     });
 };
+
+util.safe = function(argData, argCheck, argValue) {
+    var temKey = argCheck.toString().split('.'),
+        temLen = temKey.length;
+    if (!argData) {
+        return argValue;
+    }
+    if (temLen > 1) {
+        for (var i = 0; i < temLen - 1; i++) {
+            if (typeof argData[temKey[i]] !== 'object') {
+                return argValue;
+            }
+            argData = argData[temKey[i]] || {};
+        }
+    }
+    return argData[temKey[temLen - 1]] || argValue;
+}
+
 
 export default util;

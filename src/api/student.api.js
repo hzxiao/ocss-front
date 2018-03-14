@@ -18,7 +18,7 @@ export default {
     },
     create(data) {
         return httpUtil.fetch({
-            url: `${this.url}/register`,
+            url: `${this.url}`,
             method: 'post',
             data
         })
@@ -38,7 +38,7 @@ export default {
     },
     delete(id) {
         return httpUtil.fetch({
-            url: `${this.url}/delete/${id}`,
+            url: `${this.url}/${id}`,
             method: 'delete'
         })
     },
