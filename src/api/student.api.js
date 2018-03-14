@@ -18,7 +18,7 @@ export default {
     },
     create(data) {
         return httpUtil.fetch({
-            url: `${this.url}`,
+            url: this.url + 'add',
             method: 'post',
             data
         })

@@ -38,28 +38,28 @@
                     <Input v-model="formValidate.email" placeholder="输入邮箱"></Input>
                 </FormItem>
             <FormItem label="学院" prop="deptId">
-                <Select v-model="formValidate.deptId" placeholder="选择所在学院" @on-change="updateMajors()">
+                <Select v-model="formValidate.deptId" placeholder="选择所在学院" @on-change="selectChange('dept')">
                     <Option v-for="item in deptList" :value="item.id" :key="item.id">
                         {{ item.name}}
 					</Option>
                 </Select>
             </FormItem>
-            <FormItem label="专业" prop="majorId">
+            <FormItem label="专业" prop="majorId" @on-change="selectChange('major')">
                 <Select v-model="formValidate.majorId" placeholder="选择专业">
                     <Option v-for="item in majorList" :value="item.id" :key="item.id">
                         {{ item.name}}
 					</Option>
                 </Select>
             </FormItem>
-            <FormItem label="年级" prop="schoolYear">
+            <FormItem label="年级" prop="schoolYear" @on-change="selectChange('grade')">
                 <Select v-model="formValidate.schoolYear" placeholder="选择年级">
                     <Option v-for="item in gradeList" :value="item.id" :key="item.id">
                         {{ item.name}}
 					</Option>
                 </Select>
             </FormItem>
-            <FormItem label="班级" prop="classes">
-                <Select v-model="formValidate.class" placeholder="选择班级">
+            <FormItem label="班级" prop="class">
+                <Select v-model="formValidate.class" placeholder="选择班级" @on-change="selectChange('class')">
                     <Option v-for="item in classList" :value="item.id" :key="item.id">
                         {{ item.name}}
 					</Option>
@@ -159,7 +159,10 @@
             selectChange(which) {
                 switch (which) {
                     case "dept":
-                        updateMajors();
+                        if (!this.formValidate.deptId) {
+                            return
+                        }
+                        this.updateMajors();
                         this.formValidate.dept.id = this.formValidate.deptId;
                         for (var i = 0; i < this.deptList.length; i++) {
                             if (this.formValidate.deptId === this.deptList[i].id) {
