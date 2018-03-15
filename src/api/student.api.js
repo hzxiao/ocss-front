@@ -61,5 +61,12 @@ export default {
             url: '/account',
             method: 'get'
         })
+    },
+    count(data) {
+        return httpUtil.fetch({
+            url: '/count',
+            method: 'post',
+            data
+        })
     }
 }

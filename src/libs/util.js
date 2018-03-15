@@ -276,5 +276,8 @@ util.safe = function(argData, argCheck, argValue) {
     return argData[temKey[temLen - 1]] || argValue;
 }
 
+util.prefixInt = function(num, length) {
+    return (Array(length).join('0') + num).slice(-length);
+}
 
 export default util;

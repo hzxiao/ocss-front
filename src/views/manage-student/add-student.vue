@@ -8,7 +8,7 @@
         <div class="lrbox">
             <div class="left-side">
                 <FormItem label="学号" prop="id">
-                    <Input v-model="formValidate.id" placeholder="输入学号"></Input>
+                    <Input v-model="formValidate.id" readonly="true" placeholder="选择学院、年级、班级之后自动生成"></Input>
                 </FormItem>
                 <FormItem label="姓名" prop="name">
                     <Input v-model="formValidate.name" placeholder="输入学生姓名"></Input>
@@ -181,11 +181,10 @@
                         }
                         break;
                     case "grade":
-                        break;
                     case "class":
                 }
                 if (this.formValidate.deptId && this.formValidate.schoolYear) {
-
+                    this.autoSetStudentId();
                 }
             },
 
@@ -204,6 +203,8 @@
                     if (!valid) {
                         return
                     }
+
+                    this.autoSetStudentId();
                     delete this.formValidate.deptId;
                     delete this.formValidate.majorId;
                     StudentApi.create(this.formValidate).then(({ data }) => {
@@ -219,6 +220,18 @@
             },
             handleReset (name) {
                 this.$refs[name].resetFields();
+            },
+            autoSetStudentId() {
+                StudentApi.count({student: {deptId: this.formValidate.deptId, schoolYear: this.formValidate.schoolYear}}).then(({ data }) => {
+                    if (data.code === this.$code.SUCCESS) {
+                        console.log(data)
+                        var count = util.safe(data, "data.student", 0);
+                        this.formValidate.id = this.formValidate.schoolYear+this.formValidate.deptId
+                        + util.prefixInt(count+1, 3);
+                    } else {
+                        return this.$Message.error(data.msg)
+                    }
+                })
             }
         },
         mounted() {
