@@ -12,7 +12,7 @@
         <div class="condition">
             <div class="cond-item">
                 <p>学院：</p>
-                <Select v-model="selectCond.deptId" filterable clearable>
+                <Select v-model="selectCond.deptId" filterable clearable @on-change="condSelectChange('dept')">
                     <Option v-for="item in deptList" :value="item.id" :key="item.id">
                         {{ item.name}}
                     </Option>
@@ -21,7 +21,7 @@
 
             <div class="cond-item">
                 <p>专业：</p>
-                <Select v-model="selectCond.majorId" filterable clearable>
+                <Select v-model="selectCond.majorId" filterable clearable @on-change="condSelectChange('major')">
                     <Option v-for="item in majorList" :value="item.id" :key="item.id">
                         {{ item.name}}
                     </Option>
@@ -30,7 +30,7 @@
 
             <div class="cond-item">
                 <p>年级：</p>
-                <Select v-model="selectCond.schoolYear" filterable clearable>
+                <Select v-model="selectCond.schoolYear" filterable clearable @on-change="condSelectChange('grade')">
                     <Option v-for="item in gradeList" :value="item.id" :key="item.id">
                         {{item.name}}
                     </Option>
@@ -39,7 +39,7 @@
 
             <div class="cond-item">
                 <p>班级：</p>
-                <Select v-model="selectCond.class" filterable clearable>
+                <Select v-model="selectCond.class" filterable clearable @on-change="condSelectChange('class')">
                     <Option v-for="item in classList" :value="item.id" :key="item.id">
                         {{ item.name}}
                     </Option>
@@ -173,6 +173,17 @@
                     } else {
                         return this.$Message.error(data.msg)
                     }
+                });
+                this.updateMajors();
+            },
+
+            updateMajors() {
+                MajorApi.list(this.selectCond.deptId).then(({ data }) => {
+                    if (data.code === this.$code.SUCCESS) {
+                        this.majorList = util.safe(data, "data.majorList", [])
+                    } else {
+                        return this.$Message.error(data.msg)
+                    }
                 })
             },
             doSearch() {
@@ -241,6 +252,19 @@
                 this.doSearch();
             },
             changePageSize() {
+                this.doSearch();
+            },
+            condSelectChange(which) {
+                switch (which) {
+                    case 'dept':
+                        this.updateMajors();
+                        break;
+                    case 'major':
+
+                        break;
+                    case 'grade':
+                    case 'class':
+                }
                 this.doSearch();
             }
         },
