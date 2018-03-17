@@ -3,9 +3,9 @@ import httpUtil from '../libs/httpUtil'
 export default {
     url: '/students/',
     list(params) {
-        let options = httpUtil.createQueryOption(params)
+        let options = httpUtil.createOption(params);
         return httpUtil.fetch({
-            url: this.url + options,
+            url: this.url +'list' + options,
             method: 'get'
         })
     },
@@ -25,7 +25,7 @@ export default {
     },
     update(data) {
         return httpUtil.fetch({
-            url: this.url,
+            url: this.url+data.id,
             method: 'put',
             data
         })
@@ -36,10 +36,12 @@ export default {
             method: 'get'
         })
     },
-    delete(id) {
+    delete(ids) {
+        let data = {ids: ids};
         return httpUtil.fetch({
-            url: `${this.url}/${id}`,
-            method: 'delete'
+            url: `${this.url}delete/`,
+            method: 'delete',
+            data
         })
     },
     advancedSearch(searchStr, params) {
@@ -67,6 +69,12 @@ export default {
             url: '/count',
             method: 'post',
             data
+        })
+    },
+    getById(id) {
+        return httpUtil.fetch({
+            url: this.url + id,
+            method: 'get'
         })
     }
 }

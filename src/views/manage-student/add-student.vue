@@ -3,12 +3,12 @@
 </style>
 
 <template>
-  <div class="as">
+<div class="as">
     <Form ref="formValidate" :model="formValidate" :rules="ruleValidate" :label-width="80">
         <div class="lrbox">
             <div class="left-side">
                 <FormItem label="学号" prop="id">
-                    <Input v-model="formValidate.id" readonly="true" placeholder="选择学院、年级、班级之后自动生成"></Input>
+                    <Input v-model="formValidate.id" readonly placeholder="选择学院、年级、班级之后自动生成"></Input>
                 </FormItem>
                 <FormItem label="姓名" prop="name">
                     <Input v-model="formValidate.name" placeholder="输入学生姓名"></Input>
@@ -37,45 +37,43 @@
                 <FormItem label="邮箱" prop="email">
                     <Input v-model="formValidate.email" placeholder="输入邮箱"></Input>
                 </FormItem>
-            <FormItem label="学院" prop="deptId">
-                <Select v-model="formValidate.deptId" placeholder="选择所在学院" @on-change="selectChange('dept')">
-                    <Option v-for="item in deptList" :value="item.id" :key="item.id">
-                        {{ item.name}}
-					</Option>
-                </Select>
-            </FormItem>
-            <FormItem label="专业" prop="majorId" @on-change="selectChange('major')">
-                <Select v-model="formValidate.majorId" placeholder="选择专业">
-                    <Option v-for="item in majorList" :value="item.id" :key="item.id">
-                        {{ item.name}}
-					</Option>
-                </Select>
-            </FormItem>
-            <FormItem label="年级" prop="schoolYear" @on-change="selectChange('grade')">
-                <Select v-model="formValidate.schoolYear" placeholder="选择年级">
-                    <Option v-for="item in gradeList" :value="item.id" :key="item.id">
-                        {{ item.name}}
-					</Option>
-                </Select>
-            </FormItem>
-            <FormItem label="班级" prop="class">
-                <Select v-model="formValidate.class" placeholder="选择班级" @on-change="selectChange('class')">
-                    <Option v-for="item in classList" :value="item.id" :key="item.id">
-                        {{ item.name}}
-					</Option>
-                </Select>
-            </FormItem>
+                <FormItem label="学院" prop="deptId">
+                    <Select v-model="formValidate.deptId" placeholder="选择所在学院" @on-change="selectChange('dept')">
+                        <Option v-for="item in deptList" :value="item.id" :key="item.id">
+                            {{ item.name}}
+                        </Option>
+                    </Select>
+                </FormItem>
+                <FormItem label="专业" prop="majorId">
+                    <Select v-model="formValidate.majorId" placeholder="选择专业" @on-change="selectChange('major')">
+                        <Option v-for="item in majorList" :value="item.id" :key="item.id">
+                            {{ item.name}}
+                        </Option>
+                    </Select>
+                </FormItem>
+                <FormItem label="年级" prop="schoolYear">
+                    <Select v-model="formValidate.schoolYear" placeholder="选择年级" @on-change="selectChange('grade')">
+                        <Option v-for="item in gradeList" :value="item.id" :key="item.id">
+                            {{ item.name}}
+                        </Option>
+                    </Select>
+                </FormItem>
+                <FormItem label="班级" prop="class">
+                    <Select v-model="formValidate.class" placeholder="选择班级" @on-change="selectChange('class')">
+                        <Option v-for="item in classList" :value="item.id" :key="item.id">
+                            {{ item.name}}
+                        </Option>
+                    </Select>
+                </FormItem>
+            </div>
         </div>
 
-
-        </div>
-
-            <FormItem class="btn">
-                <Button type="primary" @click="handleSubmit('formValidate')">Submit</Button>
-                <Button type="ghost" @click="handleReset('formValidate')" style="margin-left: 8px">Reset</Button>
-            </FormItem>
+        <FormItem class="btn">
+            <Button type="primary" @click="handleSubmit('formValidate')">Submit</Button>
+            <Button type="ghost" @click="handleReset('formValidate')" style="margin-left: 8px">Reset</Button>
+        </FormItem>
     </Form>
-  </div>
+</div>
 </template>
 
 <script>
@@ -138,7 +136,7 @@
 					{id: "17", name: '2017级'}
 				],
 				classList: [
-	                {id: "1", name: '1版'},
+	                {id: "1", name: '1班'},
 					{id: "2", name: '2班'},
 					{id: "3", name: '3班'},
 					{id: "4", name: '4班'}

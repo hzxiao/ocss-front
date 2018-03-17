@@ -150,6 +150,13 @@ const httpUtil = {
             options = options + '&sort=' + sort
         }
         return options
+    },
+    createOption: function (obj) {
+        let options = '?';
+        for (let k in obj) {
+            options = options + k +'=' + obj[k]+'&';
+        }
+        return options.substring(0, options.length-1);
     }
 }
 

@@ -377,6 +377,13 @@ export const appRouter = [{
                 name: 'add-student',
                 component: () =>
                     import ('@/views/manage-student/add-student.vue')
+            },
+            {
+                path: 'editStudent',
+                title: '编辑学生',
+                name: 'edit-student',
+                component: () =>
+                  import ('@/views/manage-student/edit-student.vue')
             }
         ]
     },
@@ -394,14 +401,14 @@ export const appRouter = [{
                 title: '课程列表',
                 name: 'list-teacher',
                 component: () =>
-                    import ('@/views/abstract.vue')
+                    import ('@/views/manage-teacher/list-teacher.vue')
             },
             {
                 path: 'addTeacher',
                 title: '添加教师',
                 name: 'add-teacher',
                 component: () =>
-                    import ('@/views/abstract.vue')
+                    import ('@/views/manage-teacher/add-teacher.vue')
             }
         ]
     },

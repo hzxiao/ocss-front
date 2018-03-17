@@ -25,7 +25,7 @@ export default {
     },
     update (data) {
         return httpUtil.fetch({
-            url: this.url,
+            url: this.url+'/'+data.username,
             method: 'put',
             data
         })
@@ -56,9 +56,9 @@ export default {
             data
         })
     },
-    getUserInfo () {
+    getUserInfo (id) {
         return httpUtil.fetch({
-            url: '/account',
+            url: this.url+'/'+id,
             method: 'get'
         })
     }
