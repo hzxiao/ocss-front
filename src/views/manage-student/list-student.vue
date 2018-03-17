@@ -180,13 +180,14 @@
             updateMajors() {
                 MajorApi.list(this.selectCond.deptId).then(({ data }) => {
                     if (data.code === this.$code.SUCCESS) {
-                        this.majorList = util.safe(data, "data.majorList", [])
+                        this.majorList = util.safe(data, 'data.majorList', [])
                     } else {
                         return this.$Message.error(data.msg)
                     }
                 })
             },
             doSearch() {
+                this.tableLoading = true;
                 this.selectCond.id = this.searchText;
                 this.selectCond.name = this.searchText;
                 StudentApi.list(this.selectCond).then(({data}) => {
@@ -201,7 +202,9 @@
                         }
 
                         this.total = util.safe(data, 'data.total', 0);
+                        this.tableLoading = false;
                     } else {
+                        this.tableLoading = false;
                         return this.$Message.error(data.msg)
                     }
                 })
