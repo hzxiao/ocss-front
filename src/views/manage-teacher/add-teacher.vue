@@ -8,7 +8,7 @@
         <div class="lrbox">
             <div class="left-side">
                 <FormItem label="工号" prop="id">
-                    <Input v-model="form.id" readonly="true" placeholder="选择学院后自动生成"></Input>
+                    <Input v-model="form.id" readonly placeholder="选择学院后自动生成"></Input>
                 </FormItem>
                 <FormItem label="姓名" prop="name">
                     <Input v-model="form.name" placeholder="输入教师姓名"></Input>
@@ -38,7 +38,7 @@
                     <Input v-model="form.email" placeholder="输入邮箱"></Input>
                 </FormItem>
                 <FormItem label="学院" prop="deptId">
-                    <Select v-model="form.deptId" placeholder="选择所在学院" @on-change="selectChange('dept')">
+                    <Select v-model="form.deptId" placeholder="选择所在学院" @on-change="selectChange()">
                         <Option v-for="item in deptList" :value="item.id" :key="item.id">
                             {{ item.name}}
                         </Option>
@@ -52,7 +52,7 @@
                     </Select>
                 </FormItem>
 
-                <FormItem label="入职日期" prop="schoolYear" @on-change="selectChange('grade')">
+                <FormItem label="入职日期" prop="schoolYear">
                     <DatePicker type="date" v-model="form.schoolYear" placeholder="选择日期" style="width: 200px"></DatePicker>
                 </FormItem>
             </div>
@@ -67,6 +67,9 @@
 </template>
 
 <script>
+    import {DeptApi, TeacherApi} from '../../api'
+    import util from '../../libs/util';
+
     export default {
         data () {
             return {
@@ -76,14 +79,12 @@
                     email: '',
                     credit: '',
                     sex: '',
-                    age: 18,
+                    age: 40,
                     phone: '',
                     deptId: '',
                     title: '',
                     dept: {},
-                    major: {},
                     schoolYear: '',
-                    class: ''
                 },
                 ruleValidate: {
                     id: [
@@ -107,41 +108,72 @@
                     title: [
                         { required: true, message: '请选择职称', trigger: 'change' }
                     ],
-                    schoolYear: [
-                        { required: true, message: '请选择所在年级', trigger: 'change' }
+                    schoolYear1: [
+                        { required: false, message: '请选择入职日期', trigger: 'change' }
                     ],
-                    class: [
-                        { required: true, message: '请选择所在班级', trigger: 'change' }
-                    ]
                 },
                 deptList: [],
-                titleList: ["助教", "讲师", "副教授", "教授"],
-                gradeList: [
-					{id: "14", name: '2014级'},
-					{id: "15", name: '2015级'},
-					{id: "16", name: '2016级'},
-					{id: "17", name: '2017级'}
-				],
-				classList: [
-	                {id: "1", name: '1班'},
-					{id: "2", name: '2班'},
-					{id: "3", name: '3班'},
-					{id: "4", name: '4班'}
-                ]
+                titleList: ['助教', '讲师', '副教授', '教授'],
+                teacherList: [],
+
             }
         },
         methods: {
+            initCondition() {
+                DeptApi.listAll().then(({data}) => {
+                    if (data.code === this.$code.SUCCESS) {
+                        this.deptList = util.safe(data, 'data.deptList', [])
+                    } else {
+                        return this.$Message.error(data.msg)
+                    }
+                });
+            },
+            selectChange() {
+                if (!this.form.deptId) {
+                    return
+                }
+                this.form.dept.id = this.form.deptId;
+                for (let i = 0; i < this.deptList.length; i++) {
+                    if (this.form.deptId === this.deptList[i].id) {
+                        this.form.dept.name = this.deptList[i].name;
+                        break;
+                    }
+                }
+                this.autoSetTeacherId();
+            },
+            autoSetTeacherId() {
+                TeacherApi.count({teacher: {deptId: this.form.deptId}}).then(({ data }) => {
+                    if (data.code === this.$code.SUCCESS) {
+                        let count = util.safe(data, 'data.teacher', 0);
+                        this.form.id = this.form.deptId + util.prefixInt(count+1, 3);
+                    } else {
+                        return this.$Message.error(data.msg)
+                    }
+                })
+            },
             handleSubmit (name) {
                 this.$refs[name].validate((valid) => {
                     if (!valid) {
                         return
                     }
-
+                    
+                    this.autoSetTeacherId();
+                    TeacherApi.create(this.form).then(({ data }) => {
+                        if (data.code === this.$code.SUCCESS) {
+                            this.$Message.success('添加成功');
+                            this.handleReset('form')
+                        } else {
+                            return this.$Message.error(data.msg)
+                        }
+                    })
                 })
             },
             handleReset (name) {
                 this.$refs[name].resetFields();
             }
+        },
+        mounted() {
+            this.initCondition();
         }
     }
 </script>

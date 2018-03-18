@@ -130,16 +130,16 @@
                 deptList: [],
                 majorList: [],
                 gradeList: [
-					{id: "14", name: '2014级'},
-					{id: "15", name: '2015级'},
-					{id: "16", name: '2016级'},
-					{id: "17", name: '2017级'}
-				],
-				classList: [
-	                {id: "1", name: '1班'},
-					{id: "2", name: '2班'},
-					{id: "3", name: '3班'},
-					{id: "4", name: '4班'}
+                    {id: '14', name: '2014级'},
+                    {id: '15', name: '2015级'},
+                    {id: '16', name: '2016级'},
+                    {id: '17', name: '2017级'}
+                ],
+                classList: [
+                    {id: '1', name: '1班'},
+                    {id: '2', name: '2班'},
+                    {id: '3', name: '3班'},
+                    {id: '4', name: '4班'}
                 ]
             }
         },
@@ -147,8 +147,7 @@
             initCondition() {
                 DeptApi.listAll().then(({ data }) => {
                     if (data.code === this.$code.SUCCESS) {
-                        console.log(data)
-                        this.deptList = util.safe(data, "data.deptList", [])
+                        this.deptList = util.safe(data, 'data.deptList', [])
                     } else {
                         return this.$Message.error(data.msg)
                     }
@@ -189,7 +188,6 @@
             updateMajors() {
                 MajorApi.list(this.formValidate.deptId).then(({ data }) => {
                     if (data.code === this.$code.SUCCESS) {
-                        console.log(data)
                         this.majorList = util.safe(data, "data.majorList", [])
                     } else {
                         return this.$Message.error(data.msg)
@@ -207,9 +205,8 @@
                     delete this.formValidate.majorId;
                     StudentApi.create(this.formValidate).then(({ data }) => {
                         if (data.code === this.$code.SUCCESS) {
-                            console.log(data)
-                            this.$Message.success('添加成功')
-                            this.handleReset("formValidate")
+                            this.$Message.success('添加成功');
+                            this.handleReset('formValidate')
                         } else {
                             return this.$Message.error(data.msg)
                         }
@@ -222,8 +219,7 @@
             autoSetStudentId() {
                 StudentApi.count({student: {deptId: this.formValidate.deptId, schoolYear: this.formValidate.schoolYear}}).then(({ data }) => {
                     if (data.code === this.$code.SUCCESS) {
-                        console.log(data)
-                        var count = util.safe(data, "data.student", 0);
+                        var count = util.safe(data, 'data.student', 0);
                         this.formValidate.id = this.formValidate.schoolYear+this.formValidate.deptId
                         + util.prefixInt(count+1, 3);
                     } else {

@@ -398,7 +398,7 @@ export const appRouter = [{
         },
         children: [{
                 path: 'listTeacher',
-                title: '课程列表',
+                title: '教师列表',
                 name: 'list-teacher',
                 component: () =>
                     import ('@/views/manage-teacher/list-teacher.vue')
@@ -409,6 +409,13 @@ export const appRouter = [{
                 name: 'add-teacher',
                 component: () =>
                     import ('@/views/manage-teacher/add-teacher.vue')
+            },
+            {
+                path: 'editTeacher',
+                title: '编辑教师',
+                name: 'edit-teacher',
+                component: () =>
+                  import ('@/views/manage-teacher/edit-teacher.vue')
             }
         ]
     },
