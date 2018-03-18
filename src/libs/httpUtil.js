@@ -152,11 +152,16 @@ const httpUtil = {
         return options
     },
     createOption: function (obj) {
-        let options = '?';
-        for (let k in obj) {
-            options = options + k +'=' + obj[k]+'&';
-        }
-        return options.substring(0, options.length-1);
+        if (!obj) return
+        const params = Object.keys(obj)
+            .map(key => obj[key]
+                ? key === 'page'
+                    ? `${key}=${obj[key] - 1}`
+                    : `${key}=${obj[key] - 1}`
+                : '')  // {key: val, someKey: ''} -> ["key=val", ""] produce string of "key=val" or empty "" if non val is provided
+            .filter(s => s)  // clean empty string
+            .join('&')
+        return '?' + params
     }
 }
 

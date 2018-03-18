@@ -432,15 +432,19 @@ export const appRouter = [{
                 path: 'listCourse',
                 title: '课程列表',
                 name: 'list-course',
-                component: () =>
-                    import ('@/views/abstract.vue')
+                component: () => import ('@/views/manage-course/list-course.vue')
             },
             {
                 path: 'addCourse',
                 title: '添加课程',
                 name: 'add-course',
-                component: () =>
-                    import ('@/views/abstract.vue')
+                component: () => import ('@/views/manage-course/add-course.vue')
+            },
+            {
+                path: 'editCourse',
+                title: '编辑课程',
+                name: 'edit-course',
+                component: () => import ('@/views/manage-course/edit-course.vue')
             }
         ]
     },

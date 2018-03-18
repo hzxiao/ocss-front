@@ -52,7 +52,7 @@ const user = {
     },
     getters: {
         token({ token }) {
-            return JSON.parse(sessionStorage.getItem('token')) || token
+            return JSON.parse(localStorage.getItem('token')) || token
         }
     },
     actions: {
