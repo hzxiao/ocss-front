@@ -14,7 +14,7 @@
                     <Input v-model="formValidate.name" placeholder="输入学生姓名"></Input>
                 </FormItem>
                 <FormItem label="年龄" prop="age">
-                    <InputNumber v-model="formValidate.age" :min="1" :max="100" placeholder="输入学生年龄"></InputNumber>
+                    <InputNumber v-model="formValidate.credit" :min="1" :max="100" placeholder="输入学生年龄"></InputNumber>
                 </FormItem>
 
                 <FormItem label="性别" prop="sex">
@@ -30,7 +30,7 @@
 
 
                 <FormItem label="手机" prop="phone">
-                    <Input v-model="formValidate.phone" placeholder="输入手机号码"></Input>
+                    <Input v-model="formValidate.period" placeholder="输入手机号码"></Input>
                 </FormItem>
             </div>
             <div class="right-side">
@@ -38,7 +38,7 @@
                     <Input v-model="formValidate.email" placeholder="输入邮箱"></Input>
                 </FormItem>
                 <FormItem label="学院" prop="deptId">
-                    <Select v-model="formValidate.deptId" placeholder="选择所在学院" @on-change="selectChange('dept')">
+                    <Select v-model="formValidate.dept" placeholder="选择所在学院" @on-change="selectChange('dept')">
                         <Option v-for="item in deptList" :value="item.id" :key="item.id">
                             {{ item.name}}
                         </Option>
@@ -87,11 +87,9 @@
                     id: '',
                     name: '',
                     email: '',
-                    credit: '',
                     sex: '',
-                    age: 18,
-                    phone: '',
-                    deptId: '',
+                    credit: 18,
+                    period: '',
                     majorId: '',
                     dept: {},
                     major: {},
@@ -114,7 +112,7 @@
                     sex: [
                         { required: true, message: '请选择性别', trigger: 'change' }
                     ],
-                    deptId: [
+                    dept: [
                         { required: true, message: '请选择所在学院', trigger: 'change' }
                     ],
                     majorId: [
@@ -155,20 +153,20 @@
             },
             selectChange(which) {
                 switch (which) {
-                    case "dept":
-                        if (!this.formValidate.deptId) {
+                    case 'dept':
+                        if (!this.formValidate.dept) {
                             return
                         }
                         this.updateMajors();
-                        this.formValidate.dept.id = this.formValidate.deptId;
+                        this.formValidate.dept.id = this.formValidate.dept;
                         for (var i = 0; i < this.deptList.length; i++) {
-                            if (this.formValidate.deptId === this.deptList[i].id) {
+                            if (this.formValidate.dept === this.deptList[i].id) {
                                 this.formValidate.dept.name = this.deptList[i].name;
                                 break;
                             }
                         }
                         break;
-                    case "major":
+                    case 'major':
                         this.formValidate.major.id = this.formValidate.majorId;
                         for (var i = 0; i < this.majorList.length; i++) {
                             if (this.formValidate.majorId === this.majorList[i].id) {
@@ -177,18 +175,18 @@
                             }
                         }
                         break;
-                    case "grade":
-                    case "class":
+                    case 'grade':
+                    case 'class':
                 }
-                if (this.formValidate.deptId && this.formValidate.schoolYear) {
+                if (this.formValidate.dept && this.formValidate.schoolYear) {
                     this.autoSetStudentId();
                 }
             },
 
             updateMajors() {
-                MajorApi.list(this.formValidate.deptId).then(({ data }) => {
+                MajorApi.list(this.formValidate.dept).then(({ data }) => {
                     if (data.code === this.$code.SUCCESS) {
-                        this.majorList = util.safe(data, "data.majorList", [])
+                        this.majorList = util.safe(data, 'data.majorList', [])
                     } else {
                         return this.$Message.error(data.msg)
                     }
@@ -201,7 +199,7 @@
                     }
 
                     this.autoSetStudentId();
-                    delete this.formValidate.deptId;
+                    delete this.formValidate.dept;
                     delete this.formValidate.majorId;
                     StudentApi.create(this.formValidate).then(({ data }) => {
                         if (data.code === this.$code.SUCCESS) {
@@ -217,10 +215,10 @@
                 this.$refs[name].resetFields();
             },
             autoSetStudentId() {
-                StudentApi.count({student: {deptId: this.formValidate.deptId, schoolYear: this.formValidate.schoolYear}}).then(({ data }) => {
+                StudentApi.count({student: {deptId: this.formValidate.dept, schoolYear: this.formValidate.schoolYear}}).then(({ data }) => {
                     if (data.code === this.$code.SUCCESS) {
                         var count = util.safe(data, 'data.student', 0);
-                        this.formValidate.id = this.formValidate.schoolYear+this.formValidate.deptId
+                        this.formValidate.id = this.formValidate.schoolYear+this.formValidate.dept
                         + util.prefixInt(count+1, 3);
                     } else {
                         return this.$Message.error(data.msg)

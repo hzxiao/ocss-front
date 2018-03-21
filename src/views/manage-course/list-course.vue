@@ -1,11 +1,11 @@
 <style lang="less">
-    @import './list-teacher.less';
+    @import './list-course.less';
 </style>
 
 <template>
     <div class="st">
         <div class="search">
-            <Input v-model="searchText" icon="search" placeholder="输入教师姓名或工号" style="width: 200px"/>
+            <Input v-model="searchText" icon="search" placeholder="输入课程名称或号码" style="width: 200px"/>
             <Button type="primary" shape="circle" icon="ios-search" @click="doSearch()">搜索</Button>
         </div>
 
@@ -14,25 +14,24 @@
                 <p>学院：</p>
                 <Select v-model="selectCond.dept" filterable clearable @on-change="condSelectChange()">
                     <Option v-for="item in deptList" :value="item.id" :key="item.id">
-                        {{ item.name}}
+                        {{ item.name }}
                     </Option>
                 </Select>
             </div>
-
             <div class="cond-item">
-                <p>职称：</p>
-                <Select v-model="selectCond.title" filterable clearable @on-change="condSelectChange()">
-                    <Option v-for="item in titleList" :value="item" :key="item">
-                        {{ item }}
+                <p>专业：</p>
+                <Select v-model="selectCond.dept" filterable clearable @on-change="condSelectChange()">
+                    <Option v-for="item in deptList" :value="item.id" :key="item.id">
+                        {{ item.name }}
                     </Option>
                 </Select>
             </div>
         </div>
         <div class="op-menu">
-            <Button type="default" @click="doExport()" :disabled="selection.length == 0">批量导出</Button>
-            <Button type="default" @click="doDeleteBatch()" :disabled="selection.length == 0">批量删除</Button>
+            <Button type="default" @click="doExport('课程列表')" :disabled="!selection.length">批量导出</Button>
+            <Button type="default" @click="deleteBatch()" :disabled="!selection.length">批量删除</Button>
         </div>
-        <Table ref="table" :loading="tableLoading" :data="teacherList" :columns="tableColumns"
+        <Table ref="table" :loading="tableLoading" :data="courses" :columns="tableColumns"
                @on-selection-change="selectionChange" stripe>
             <div slot="footer" style="padding-left:5px">
                 <Page :total="total" :current="selectCond.page"
@@ -49,7 +48,7 @@
 </template>
 
 <script>
-    import {DeptApi, TeacherApi} from '../../api'
+    import {CourseApi, TeacherApi} from '../../api'
     import util from '../../libs/util';
 
     export default {
@@ -74,25 +73,25 @@
                     width: 60,
                     align: 'center'
                 }, {
-                    title: '工号',
+                    title: '课程号码',
                     key: 'id'
                 }, {
-                    title: '姓名',
+                    title: '名称',
                     key: 'name'
                 }, {
                     title: '学院',
-                    key: 'deptName'
+                    key: 'dept.name'
                 }, {
-                    title: '职称',
-                    key: 'title'
+                    title: '专业',
+                    key: 'dept.major'
                 }, {
-                    title: '入职日期',
-                    key: 'schoolYear'
+                    title: '学分',
+                    key: 'credit'
                 }, {
-                    title: '性别',
-                    key: 'sex'
+                    title: '描述',
+                    key: 'desc'
                 }, {
-                    title: 'Action',
+                    title: '操作',
                     key: 'action',
                     width: 150,
                     align: 'center',
@@ -100,20 +99,20 @@
                         return h('div', [
                             h(
                                 'Button', {
-                                    props: {type: 'primary', size: 'small'}, 
-                                    style: {marginRight: '5px'}, 
+                                    props: {type: 'primary', size: 'small'},
+                                    style: {marginRight: '5px'},
                                     on: {
                                         click: () => {
-                                            this.$router.push({name: 'edit-teacher', params: {id: this.teacherList[params.index].id}});
+                                            this.$router.push({name: 'edit-course', params: {id: this.teacherList[params.index].id}});
                                         }
-                                    }}, 
+                                    }},
                                 '编辑'
                             ), h(
                                 'Button', {
                                     props: {type: 'error', size: 'small'},
                                     on: {
                                         click: () => {
-                                            this.deleteTea(params.index)
+                                            this.deleteCourse(params.index)
                                         }
                                     }},
                                 '删除'
@@ -121,43 +120,23 @@
                         ])
                     }
                 }],
-                teacherList: [],
                 deptList: [],
-                titleList: ['助教', '讲师', '副教授', '教授'],
+                courses: []
             }
         },
         methods: {
             initCondition() {
-                DeptApi.listAll().then(({data}) => {
-                    if (data.code === this.$code.SUCCESS) {
-                        this.deptList = util.safe(data, 'data.deptList', [])
-                    } else {
-                        return this.$Message.error(data.msg)
-                    }
-                });
+
             },
 
             doSearch() {
-                this.tableLoading = true;
-                this.selectCond.id = this.searchText;
-                this.selectCond.name = this.searchText;
-                TeacherApi.list(this.selectCond).then(({data}) => {
+                this.tableLoading = true
+                this.selectCond.id = this.searchText
+                this.selectCond.name = this.searchText
+
+                CourseApi.list(this.selectCond).then(({data}) => {
                     if (data.code === this.$code.SUCCESS) {
-                        this.teacherList = util.safe(data, 'data.teacherList', []);
-
-                        for (let i = 0; i < this.teacherList.length; i++) {
-                            this.teacherList[i].deptName = this.teacherList[i].dept.name;
-                            if (this.teacherList[i].schoolYear) {
-                                this.teacherList[i].schoolYear = this.teacherList[i].schoolYear.substring(0, 10);
-                            }
-                            if (this.teacherList[i].sex === 'female') {
-                                this.teacherList[i].sex = '女';
-                            } else {
-                                this.teacherList[i].sex = '男';
-                            }
-                        }
-
-                        this.total = util.safe(data, 'data.total', 0);
+                        this.courses = util.safe(data, 'data.courseList', [])
                         this.tableLoading = false;
                     } else {
                         this.tableLoading = false;
@@ -165,21 +144,15 @@
                     }
                 })
             },
-            doExport() {
-                this.$refs.table.exportCsv({
-                    filename: '教师信息'
-                })
+            doExport(filename) {
+                this.$refs.table.exportCsv({ filename })
             },
             deleteBatch() {
                 this.$Modal.confirm({
-                    title: '删除选中的教师',
-                    content: '确定删除选中的教师，删除后不可恢复',
+                    title: '删除选中的课程',
+                    content: '确定删除选中的课程，删除后不可恢复',
                     onOk: () => {
-                        let ids = [];
-                        for (let i = 0; i < this.selection.length; i++) {
-                            ids.push(this.selection[i].id);
-                        }
-                        this.delete(ids);
+                        this.delete(this.selection.map(selection => selection.id))
                     }
                 })
             },
@@ -188,38 +161,34 @@
             },
             deleteCourse(index) {
                 this.$Modal.confirm({
-                    title: '删除选中的教师',
-                    content: '确定删除选中的教师，删除后不可恢复',
-                    onOk: () => {
-                        let ids = [];
-                        ids.push(this.teacherList[index].id);
-                        this.delete(ids);
-                    }
+                    title: '删除选中的课程',
+                    content: '确定删除选中的课程，删除后不可恢复',
+                    onOk: () => this.delete([this.courses[index].id])
                 })
             },
             delete(ids) {
-                TeacherApi.delete(ids).then(({data}) => {
+                CourseApi.delete(ids).then(({data}) => {
                     if (data.code === this.$code.SUCCESS) {
                         this.$Message.success('删除成功')
-                        this.doSearch();
+                        this.doSearch()
                     } else {
                         return this.$Message.error(data.msg)
                     }
                 })
             },
             changePage() {
-                this.doSearch();
+                this.doSearch()
             },
             changePageSize() {
-                this.doSearch();
+                this.doSearch()
             },
             condSelectChange() {
-                this.doSearch();
+                this.doSearch()
             }
         },
         mounted() {
-            this.initCondition();
-            this.doSearch();
+            this.initCondition()
+            this.doSearch()
         }
     }
 </script>

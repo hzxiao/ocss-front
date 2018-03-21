@@ -98,7 +98,7 @@ export default {
             data9: [
                 {
                     name: '王小明',
-                    age: 18,
+                    credit: 18,
                     address: '北京市朝阳区芍药居',
                     job: '数据工程师',
                     interest: '羽毛球',
@@ -109,7 +109,7 @@ export default {
                 },
                 {
                     name: '张小刚',
-                    age: 25,
+                    credit: 25,
                     address: '北京市海淀区西二旗',
                     job: '数据科学家',
                     interest: '排球',
@@ -120,7 +120,7 @@ export default {
                 },
                 {
                     name: '李小红',
-                    age: 30,
+                    credit: 30,
                     address: '上海市浦东新区世纪大道',
                     job: '数据产品经理',
                     interest: '网球',
@@ -131,7 +131,7 @@ export default {
                 },
                 {
                     name: '周小伟',
-                    age: 26,
+                    credit: 26,
                     address: '深圳市南山区深南大道',
                     job: '数据分析师',
                     interest: '桌球，跑步',

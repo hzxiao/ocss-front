@@ -18,3 +18,7 @@ export {
     default as TeacherApi
 }
     from './teacher.api'
+
+export {
+    default as CourseApi
+} from './course.api'
