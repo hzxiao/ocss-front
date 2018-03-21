@@ -458,7 +458,7 @@ export const appRouter = [{
                 title: '选课列表',
                 name: 'list-teach-course',
                 component: () =>
-                    import ('@/views/abstract.vue')
+                    import ('@/views/manage-teach-course/list-tc.vue')
             },
             {
                 path: 'addTeachCourse',
