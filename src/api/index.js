@@ -22,3 +22,7 @@ export {
 export {
     default as CourseApi
 } from './course.api'
+
+export {
+    default as TcApi
+} from './tc.api'

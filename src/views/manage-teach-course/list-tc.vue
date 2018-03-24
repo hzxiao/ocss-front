@@ -5,7 +5,7 @@
 <template>
     <div class="st">
         <div class="search">
-            <Input v-model="searchText" icon="search" placeholder="输入教师姓名或课程名称" style="width: 200px"/>
+            <Input v-model="selectCond.name" icon="search" placeholder="输入课程名称" style="width: 200px"/>
             <Button type="primary" shape="circle" icon="ios-search" @click="doSearch()">搜索</Button>
         </div>
 
@@ -22,14 +22,14 @@
             <div class="cond-item">
                 <p>可选状态：</p>
                 <Select v-model="selectCond.selectState" filterable clearable @on-change="condSelectChange()">
-                    <Option v-for="item in stateList" :value="item.id" :key="item">
+                    <Option v-for="item in stateList" :value="item.id" :key="item.id">
                         {{ item.name }}
                     </Option>
                 </Select>
             </div>
             <div class="cond-item">
                 <p>性质：</p>
-                <Select v-model="selectCond.nature" filterable clearable @on-change="condSelectChange()">
+                <Select v-model="selectCond.attr" filterable clearable @on-change="condSelectChange()">
                     <Option v-for="item in natureList" :value="item" :key="item">
                         {{ item }}
                     </Option>
@@ -38,7 +38,7 @@
             <div class="cond-item">
                 <p>归属：</p>
                 <Select v-model="selectCond.nature" filterable clearable @on-change="condSelectChange()">
-                    <Option v-for="item in natureList" :value="item" :key="item">
+                    <Option v-for="item in attrList" :value="item" :key="item">
                         {{ item }}
                     </Option>
                 </Select>
@@ -46,7 +46,7 @@
 
 
         </div>
-        <Tabs :value="selectCond.selectState" type="card" @on-click="condSelectChange()" :animated="false">
+        <Tabs value="0" type="card" @on-click="tabsChange" :animated="false">
             <TabPane label="全部" name="0">
 
             </TabPane>
@@ -69,7 +69,7 @@
             <Button type="default" @click="doDeleteBatch()" :disabled="selection.length == 0">设置不可选</Button>
         </div>
 
-        <Table ref="table" :loading="tableLoading" :data="teacherList" :columns="tableColumns"
+        <Table ref="table" :loading="tableLoading" :data="tcList" :columns="tableColumns"
                @on-selection-change="selectionChange" stripe>
             <div slot="footer" style="padding-left:5px">
                 <Page :total="total" :current="selectCond.page"
@@ -86,8 +86,9 @@
 </template>
 
 <script>
-    import {DeptApi, TeacherApi} from '../../api'
+    import {DeptApi, TcApi} from '../../api'
     import util from '../../libs/util';
+    import {attrList, natureList} from '../../libs/data';
 
     export default {
         data() {
@@ -97,10 +98,10 @@
                 selection: [],
                 searchText: '',
                 selectCond: {
-                    id: '',
                     name: '',
                     deptId: '',
                     nature: '',
+                    attr: '',
                     selectState: '0',
                     page: 1,
                     pageSize: 20,
@@ -127,13 +128,13 @@
                     key: 'schoolYear'
                 }, {
                     title: '结束选课时间',
-                    key: 'sex'
+                    key: 'end'
                 },  {
                     title: '性质',
-                    key: 'sex'
+                    key: 'nature'
                 }, {
                     title: '归属',
-                    key: 'sex'
+                    key: 'attr'
                 },{
                     title: 'Action',
                     key: 'action',
@@ -147,7 +148,7 @@
                                   style: {marginRight: '5px'},
                                   on: {
                                       click: () => {
-                                          this.$router.push({name: 'edit-teacher', params: {id: this.teacherList[params.index].id}});
+                                          this.$router.push({name: 'edit-teacher', params: {id: this.tcList[params.index].id}});
                                       }
                                   }},
                               '进入编辑'
@@ -155,9 +156,10 @@
                         ])
                     }
                 }],
-                teacherList: [],
+                tcList: [],
                 deptList: [],
-                natureList: ['社会科学类'],
+                natureList,
+                attrList,
                 stateList: [{
                     id: 1,
                     name: '可选'
@@ -180,22 +182,11 @@
 
             doSearch() {
                 this.tableLoading = true;
-                this.selectCond.id = this.searchText;
-                this.selectCond.name = this.searchText;
-                TeacherApi.list(this.selectCond).then(({data}) => {
+                TcApi.list(this.selectCond).then(({data}) => {
                     if (data.code === this.$code.SUCCESS) {
-                        this.teacherList = util.safe(data, 'data.teacherList', []);
+                        this.tcList = util.safe(data, 'data.tcList', []);
 
-                        for (let i = 0; i < this.teacherList.length; i++) {
-                            this.teacherList[i].deptName = this.teacherList[i].dept.name;
-                            if (this.teacherList[i].schoolYear) {
-                                this.teacherList[i].schoolYear = this.teacherList[i].schoolYear.substring(0, 10);
-                            }
-                            if (this.teacherList[i].sex === 'female') {
-                                this.teacherList[i].sex = '女';
-                            } else {
-                                this.teacherList[i].sex = '男';
-                            }
+                        for (let i = 0; i < this.tcList.length; i++) {
                         }
 
                         this.total = util.safe(data, 'data.total', 0);
@@ -208,13 +199,13 @@
             },
             doExport() {
                 this.$refs.table.exportCsv({
-                    filename: '教师信息'
+                    filename: '选课信息'
                 })
             },
             doDeleteBatch() {
                 this.$Modal.confirm({
-                    nature: '删除选中的教师',
-                    content: '确定删除选中的教师，删除后不可恢复',
+                    nature: '删除选中的选课',
+                    content: '确定删除选中的选课，删除后不可恢复',
                     onOk: () => {
                         let ids = [];
                         for (let i = 0; i < this.selection.length; i++) {
@@ -229,17 +220,17 @@
             },
             deleteTea(index) {
                 this.$Modal.confirm({
-                    nature: '删除选中的教师',
-                    content: '确定删除选中的教师，删除后不可恢复',
+                    nature: '删除选中的选课',
+                    content: '确定删除选中的选课，删除后不可恢复',
                     onOk: () => {
                         let ids = [];
-                        ids.push(this.teacherList[index].id);
+                        ids.push(this.tcList[index].id);
                         this.delete(ids);
                     }
                 })
             },
             delete(ids) {
-                TeacherApi.delete(ids).then(({data}) => {
+                TcApi.delete(ids).then(({data}) => {
                     if (data.code === this.$code.SUCCESS) {
                         this.$Message.success('删除成功')
                         this.doSearch();
@@ -255,6 +246,10 @@
                 this.doSearch();
             },
             condSelectChange() {
+                this.doSearch();
+            },
+            tabsChange(name) {
+                this.selectCond.selectState = name;
                 this.doSearch();
             }
         },
