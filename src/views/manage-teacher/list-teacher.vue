@@ -12,7 +12,7 @@
         <div class="condition">
             <div class="cond-item">
                 <p>学院：</p>
-                <Select v-model="selectCond.dept" filterable clearable @on-change="condSelectChange()">
+                <Select v-model="selectCond.deptId" filterable clearable @on-change="condSelectChange()">
                     <Option v-for="item in deptList" :value="item.id" :key="item.id">
                         {{ item.name}}
                     </Option>
@@ -62,7 +62,7 @@
                 selectCond: {
                     id: '',
                     name: '',
-                    dept: '',
+                    deptId: '',
                     title: '',
                     schoolYear: '',
                     page: 1,
@@ -170,7 +170,7 @@
                     filename: '教师信息'
                 })
             },
-            deleteBatch() {
+            doDeleteBatch() {
                 this.$Modal.confirm({
                     title: '删除选中的教师',
                     content: '确定删除选中的教师，删除后不可恢复',
@@ -186,7 +186,7 @@
             selectionChange(selection) {
                 this.selection = selection
             },
-            deleteCourse(index) {
+            deleteTea(index) {
                 this.$Modal.confirm({
                     title: '删除选中的教师',
                     content: '确定删除选中的教师，删除后不可恢复',

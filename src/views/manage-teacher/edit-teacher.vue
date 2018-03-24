@@ -16,7 +16,7 @@
                                 <Input v-model="form.name" placeholder="输入教师姓名"></Input>
                             </FormItem>
                             <FormItem label="年龄" prop="age">
-                                <InputNumber v-model="form.credit" :min="1" :max="100" placeholder="输入教师年龄"></InputNumber>
+                                <InputNumber v-model="form.age" :min="1" :max="100" placeholder="输入教师年龄"></InputNumber>
                             </FormItem>
 
                             <FormItem label="性别" prop="sex">
@@ -32,7 +32,7 @@
 
 
                             <FormItem label="手机" prop="phone">
-                                <Input v-model="form.period" placeholder="输入手机号码"></Input>
+                                <Input v-model="form.phone" placeholder="输入手机号码"></Input>
                             </FormItem>
                         </div>
                         <div class="right-side">
@@ -40,7 +40,7 @@
                                 <Input v-model="form.email" placeholder="输入邮箱"></Input>
                             </FormItem>
                             <FormItem label="学院" prop="deptId">
-                                <Select v-model="form.dept" placeholder="选择所在学院" @on-change="selectChange()">
+                                <Select v-model="form.deptId" placeholder="选择所在学院" @on-change="selectChange()">
                                     <Option v-for="item in deptList" :value="item.id" :key="item.id">
                                         {{ item.name}}
                                     </Option>
@@ -104,9 +104,9 @@
                     email: '',
                     credit: '',
                     sex: '',
-                    credit: 40,
-                    period: '',
-                    dept: '',
+                    age: 40,
+                    phone: '',
+                    deptId: '',
                     title: '',
                     dept: {},
                     schoolYear: '',
@@ -127,7 +127,7 @@
                     sex: [
                         { required: true, message: '请选择性别', trigger: 'change' }
                     ],
-                    dept: [
+                    deptId: [
                         { required: true, message: '请选择所在学院', trigger: 'change' }
                     ],
                     title: [
@@ -171,7 +171,7 @@
                 TeacherApi.getById(id).then(({data}) => {
                     if (data.code === this.$code.SUCCESS) {
                         this.form = util.safe(data, 'data.teacher', {});
-                        this.form.dept = this.form.dept.id;
+                        this.form.deptId = this.form.dept.id;
                     } else {
                         return this.$Message.error(data.msg)
                     }
@@ -185,12 +185,12 @@
                 })
             },
             selectChange() {
-                if (!this.form.dept) {
+                if (!this.form.deptId) {
                     return
                 }
-                this.form.dept.id = this.form.dept;
+                this.form.dept.id = this.form.deptId;
                 for (let i = 0; i < this.deptList.length; i++) {
-                    if (this.form.dept === this.deptList[i].id) {
+                    if (this.form.deptId === this.deptList[i].id) {
                         this.form.dept.name = this.deptList[i].name;
                         break;
                     }
@@ -201,7 +201,7 @@
                     if (!valid) {
                         return
                     }
-                    delete this.form.dept;
+                    delete this.form.deptId;
                     delete this.form.majorId;
                     if (which == 1) {
                         TeacherApi.update(this.form).then(({data}) => {

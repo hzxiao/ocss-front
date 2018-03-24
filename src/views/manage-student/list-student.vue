@@ -12,7 +12,7 @@
         <div class="condition">
             <div class="cond-item">
                 <p>学院：</p>
-                <Select v-model="selectCond.dept" filterable clearable @on-change="condSelectChange('dept')">
+                <Select v-model="selectCond.deptId" filterable clearable @on-change="condSelectChange('dept')">
                     <Option v-for="item in deptList" :value="item.id" :key="item.id">
                         {{ item.name}}
                     </Option>
@@ -80,7 +80,7 @@
                 selectCond: {
                     id: '',
                     name: '',
-                    dept: '',
+                    deptId: '',
                     majorId: '',
                     schoolYear: '',
                     class: '',
@@ -123,27 +123,27 @@
                                     size: 'small'
                                 }, style: {
                                     marginRight: '5px'
-                                }, on: {
-                                    click: () => {
-                                        this.$router.push({name: 'edit-student', params: {id: this.stuList[params.index].id}});
-                                    }
-                                }
-                            },
-                            '编辑'
+                                  }, on: {
+                                      click: () => {
+                                          this.$router.push({name: 'edit-student', params: {id: this.stuList[params.index].id}});
+                                      }
+                                  }
+                              },
+                              '编辑'
                             ),
                             h(
-                                'Button', {
-                                    props: {
-                                        type: 'error',
-                                        size: 'small'
-                                    },
-                                    on: {
-                                        click: () => {
-                                            this.deleteStu(params.index)
-                                        }
-                                    }
-                                },
-                                '删除'
+                              'Button', {
+                                  props: {
+                                      type: 'error',
+                                      size: 'small'
+                                  },
+                                  on: {
+                                      click: () => {
+                                          this.deleteStu(params.index)
+                                      }
+                                  }
+                              },
+                              '删除'
                             )
                         ])
                     }
@@ -152,16 +152,16 @@
                 deptList: [],
                 majorList: [],
                 gradeList: [
-                    {id: '14', name: '2014级'},
-                    {id: '15', name: '2015级'},
-                    {id: '16', name: '2016级'},
-                    {id: '17', name: '2017级'}
+                    {id: "14", name: '2014级'},
+                    {id: "15", name: '2015级'},
+                    {id: "16", name: '2016级'},
+                    {id: "17", name: '2017级'}
                 ],
                 classList: [
-                    {id: '1', name: '1班'},
-                    {id: '2', name: '2班'},
-                    {id: '3', name: '3班'},
-                    {id: '4', name: '4班'}
+                    {id: "1", name: '1班'},
+                    {id: "2", name: '2班'},
+                    {id: "3", name: '3班'},
+                    {id: "4", name: '4班'}
                 ]
             }
         },
@@ -178,7 +178,7 @@
             },
 
             updateMajors() {
-                MajorApi.list(this.selectCond.dept).then(({ data }) => {
+                MajorApi.list(this.selectCond.deptId).then(({ data }) => {
                     if (data.code === this.$code.SUCCESS) {
                         this.majorList = util.safe(data, 'data.majorList', [])
                     } else {
@@ -214,7 +214,7 @@
                     filename: '学生信息'
                 })
             },
-            deleteBatch() {
+            doDeleteBatch() {
                 this.$Modal.confirm({
                     title: '删除选中的学生',
                     content: '确定删除选中的学生，删除后不可恢复',
@@ -236,8 +236,8 @@
                     content: '确定删除选中的学生，删除后不可恢复',
                     onOk: () => {
                         let ids = [];
-                        ids.push(this.stuList[index].id)
-                        this.delete(ids)
+                        ids.push(this.stuList[index].id);
+                        this.delete(ids);
                     }
                 })
             },
@@ -272,8 +272,8 @@
             }
         },
         mounted() {
-            this.initCondition()
-            this.doSearch()
+            this.initCondition();
+            this.doSearch();
         }
     }
 </script>

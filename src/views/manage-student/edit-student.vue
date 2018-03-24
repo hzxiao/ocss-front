@@ -16,7 +16,7 @@
                                 <Input v-model="formValidate.name" placeholder="输入学生姓名"></Input>
                             </FormItem>
                             <FormItem label="年龄" prop="age">
-                                <InputNumber v-model="formValidate.credit" :min="1" :max="100"
+                                <InputNumber v-model="formValidate.age" :min="1" :max="100"
                                              placeholder="输入学生年龄"></InputNumber>
                             </FormItem>
 
@@ -33,7 +33,7 @@
 
 
                             <FormItem label="手机" prop="phone">
-                                <Input v-model="formValidate.period" placeholder="输入手机号码"></Input>
+                                <Input v-model="formValidate.phone" placeholder="输入手机号码"></Input>
                             </FormItem>
                         </div>
                         <div class="right-side">
@@ -41,7 +41,7 @@
                                 <Input v-model="formValidate.email" placeholder="输入邮箱"></Input>
                             </FormItem>
                             <FormItem label="学院" prop="deptId">
-                                <Select v-model="formValidate.dept" placeholder="选择所在学院"
+                                <Select v-model="formValidate.deptId" placeholder="选择所在学院"
                                         @on-change="selectChange('dept')">
                                     <Option v-for="item in deptList" :value="item.id" :key="item.id">
                                         {{ item.name}}
@@ -118,7 +118,9 @@
                     email: '',
                     credit: '',
                     sex: '',
-                    period: '',
+                    age: 18,
+                    phone: '',
+                    deptId: '',
                     majorId: '',
                     dept: {},
                     major: {},
@@ -141,7 +143,7 @@
                     sex: [
                         {required: true, message: '请选择性别', trigger: 'change'}
                     ],
-                    dept: [
+                    deptId: [
                         {required: true, message: '请选择所在学院', trigger: 'change'}
                     ],
                     majorId: [
@@ -157,16 +159,16 @@
                 deptList: [],
                 majorList: [],
                 gradeList: [
-                    {id: '14', name: '2014级'},
-                    {id: '15', name: '2015级'},
-                    {id: '16', name: '2016级'},
-                    {id: '17', name: '2017级'}
+                    {id: "14", name: '2014级'},
+                    {id: "15", name: '2015级'},
+                    {id: "16", name: '2016级'},
+                    {id: "17", name: '2017级'}
                 ],
                 classList: [
-                    {id: '1', name: '1班'},
-                    {id: '2', name: '2班'},
-                    {id: '3', name: '3班'},
-                    {id: '4', name: '4班'}
+                    {id: "1", name: '1班'},
+                    {id: "2", name: '2班'},
+                    {id: "3", name: '3班'},
+                    {id: "4", name: '4班'}
                 ],
                 accountInfo: {
                     username: '',
@@ -190,7 +192,7 @@
                 DeptApi.listAll().then(({data}) => {
                     if (data.code === this.$code.SUCCESS) {
                         console.log(data)
-                        this.deptList = util.safe(data, 'data.deptList', [])
+                        this.deptList = util.safe(data, "data.deptList", [])
                     } else {
                         return this.$Message.error(data.msg)
                     }
@@ -203,7 +205,7 @@
                     if (data.code === this.$code.SUCCESS) {
                         console.log(data);
                         this.formValidate = util.safe(data, 'data.student', {});
-                        this.formValidate.dept = this.formValidate.dept.id;
+                        this.formValidate.deptId = this.formValidate.dept.id;
                         this.updateMajors();
                         this.formValidate.majorId = this.formValidate.major.id;
                     } else {
@@ -221,13 +223,13 @@
             },
             selectChange(which) {
                 switch (which) {
-                    case 'dept':
-                        if (!this.formValidate.dept) {
+                    case "dept":
+                        if (!this.formValidate.deptId) {
                             return
                         }
-                        this.formValidate.dept.id = this.formValidate.dept;
+                        this.formValidate.dept.id = this.formValidate.deptId;
                         for (var i = 0; i < this.deptList.length; i++) {
-                            if (this.formValidate.dept === this.deptList[i].id) {
+                            if (this.formValidate.deptId === this.deptList[i].id) {
                                 this.formValidate.dept.name = this.deptList[i].name;
                                 break;
                             }
@@ -242,12 +244,12 @@
                             }
                         }
                         break;
-                    case 'grade':
-                    case 'class':
+                    case "grade":
+                    case "class":
                 }
             },
             updateMajors() {
-                MajorApi.list(this.formValidate.dept).then(({data}) => {
+                MajorApi.list(this.formValidate.deptId).then(({data}) => {
                     if (data.code === this.$code.SUCCESS) {
                         console.log(data);
                         this.majorList = util.safe(data, 'data.majorList', [])
@@ -262,7 +264,7 @@
                     if (!valid) {
                         return
                     }
-                    delete this.formValidate.dept;
+                    delete this.formValidate.deptId;
                     delete this.formValidate.majorId;
                     if (which == 1) {
                         StudentApi.update(this.formValidate).then(({data}) => {
