@@ -30,6 +30,13 @@ export default {
             data
         })
     },
+    updatePass (data) {
+        return httpUtil.fetch({
+            url: `${this.url}/password`,
+            method: 'post',
+            data
+        })
+    },
     find (id) {
         return httpUtil.fetch({
             url: this.url + encodeURIComponent(id),
