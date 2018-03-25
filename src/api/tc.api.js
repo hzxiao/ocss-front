@@ -46,7 +46,7 @@ export default {
     delete(ids) {
         let data = {ids: ids};
         return httpUtil.fetch({
-            url: `${this.url}delete/`,
+            url: `${this.url}`,
             method: 'delete',
             data
         })
