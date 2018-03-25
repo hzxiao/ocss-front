@@ -26,3 +26,7 @@ export {
 export {
     default as TcApi
 } from './tc.api'
+
+export {
+    default as NoticeApi
+} from './notice.api'
