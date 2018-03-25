@@ -30,6 +30,13 @@ export default {
             data
         })
     },
+    updateBatch(data) {
+        return httpUtil.fetch({
+            url: this.url+'all',
+            method: 'put',
+            data
+        })
+    },
     find(id) {
         return httpUtil.fetch({
             url: this.url + encodeURIComponent(id),

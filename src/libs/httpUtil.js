@@ -151,7 +151,8 @@ const httpUtil = {
         }
         return options
     },
-    createOption: function (obj) {
+    createOption: function (o) {
+        let obj = JSON.parse(JSON.stringify(o))
         let options = '?';
         for (let k in obj) {
             if (k === 'page' && obj[k] > 0) {

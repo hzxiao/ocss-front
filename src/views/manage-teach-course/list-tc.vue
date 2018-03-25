@@ -21,7 +21,7 @@
 
             <div class="cond-item">
                 <p>可选状态：</p>
-                <Select v-model="selectCond.selectState" filterable clearable @on-change="condSelectChange()">
+                <Select v-model="selectCond.status" filterable clearable @on-change="condSelectChange()">
                     <Option v-for="item in stateList" :value="item.id" :key="item.id">
                         {{ item.name }}
                     </Option>
@@ -29,7 +29,7 @@
             </div>
             <div class="cond-item">
                 <p>性质：</p>
-                <Select v-model="selectCond.attr" filterable clearable @on-change="condSelectChange()">
+                <Select v-model="selectCond.nature" filterable clearable @on-change="condSelectChange()">
                     <Option v-for="item in natureList" :value="item" :key="item">
                         {{ item }}
                     </Option>
@@ -37,7 +37,7 @@
             </div>
             <div class="cond-item">
                 <p>归属：</p>
-                <Select v-model="selectCond.nature" filterable clearable @on-change="condSelectChange()">
+                <Select v-model="selectCond.attr" filterable clearable @on-change="condSelectChange()">
                     <Option v-for="item in attrList" :value="item" :key="item">
                         {{ item }}
                     </Option>
@@ -50,23 +50,23 @@
             <TabPane label="全部" name="0">
 
             </TabPane>
-            <TabPane label="选课中" name="1">
+            <TabPane label="选课中" name="2">
 
             </TabPane>
-            <TabPane label="未开始" name="2">
+            <TabPane label="未开始" name="3">
 
             </TabPane>
-            <TabPane label="已结束" name="3">
+            <TabPane label="已结束" name="1">
 
             </TabPane>
         </Tabs>
         <div class="op-menu">
             <Button type="default" @click="doExport()" :disabled="selection.length == 0">批量导出</Button>
             <Button type="default" @click="doDeleteBatch()" :disabled="selection.length == 0">批量删除</Button>
-            <Button type="default" @click="doDeleteBatch()" :disabled="selection.length == 0">设置容量</Button>
-            <Button type="default" @click="doDeleteBatch()" :disabled="selection.length == 0">设置选课时间</Button>
-            <Button type="default" @click="doDeleteBatch()" :disabled="selection.length == 0">设置可选</Button>
-            <Button type="default" @click="doDeleteBatch()" :disabled="selection.length == 0">设置不可选</Button>
+            <Button type="default" @click="setCap()" :disabled="selection.length == 0">设置容量</Button>
+            <Button type="default" @click="setSelectTime()" :disabled="selection.length == 0">设置选课时间</Button>
+            <Button type="default" @click="setSelectState(1)" :disabled="selection.length == 0">设置可选</Button>
+            <Button type="default" @click="setSelectState(2)" :disabled="selection.length == 0">设置不可选</Button>
         </div>
 
         <Table ref="table" :loading="tableLoading" :data="tcList" :columns="tableColumns"
@@ -81,6 +81,23 @@
                       show-elevator show-total show-sizer></Page>
             </div>
         </Table>
+
+        <Modal
+                v-model="selectTimeModel"
+                title="设置选课时间"
+                loading
+                @on-ok="modelOk('')">
+            <DatePicker type="datetimerange" v-model="selectTimeStr" format="yyyy-MM-dd HH:mm" placeholder="选择选课起始结束时间" style="width: 300px"></DatePicker>
+
+        </Modal>
+
+        <Modal
+                v-model="capModel"
+                title="设置容量"
+                loading
+                @on-ok="modelOk('cap')">
+            <InputNumber v-model="capacity" :min="1" :max="150" placeholder="输入容量"></InputNumber>
+        </Modal>
     </div>
 
 </template>
@@ -103,6 +120,7 @@
                     nature: '',
                     attr: '',
                     selectState: '0',
+                    status: 0,
                     page: 1,
                     pageSize: 20,
                     sort: '-create'
@@ -116,7 +134,7 @@
                     key: 'courseName'
                 }, {
                     title: '任课老师',
-                    key: 'name'
+                    key: 'teacherName'
                 }, {
                     title: '开课学院',
                     key: 'deptName'
@@ -125,7 +143,7 @@
                     key: 'marginAndCap'
                 }, {
                     title: '开始选课时间',
-                    key: 'schoolYear'
+                    key: 'start'
                 }, {
                     title: '结束选课时间',
                     key: 'end'
@@ -143,15 +161,14 @@
                     render: (h, params) => {
                         return h('div', [
                             h(
-                              'Button', {
-                                  props: {type: 'primary', size: 'small'},
-                                  style: {marginRight: '5px'},
-                                  on: {
-                                      click: () => {
-                                          this.$router.push({name: 'edit-teacher', params: {id: this.tcList[params.index].id}});
-                                      }
-                                  }},
-                              '进入编辑'
+                                'Button', {
+                                    props: {type: 'primary', size: 'small'}, style: {marginRight: '5px'},
+                                    on: {
+                                        click: () => {
+                                            this.$router.push({name: 'edit-teacher', params: {id: this.tcList[params.index].id}});
+                                        }
+                                    }},
+                                '进入编辑'
                             )
                         ])
                     }
@@ -166,7 +183,11 @@
                 }, {
                     id: 2,
                     name: '不可选'
-                }]
+                }],
+                selectTimeModel: false,
+                selectTimeStr: '',
+                capModel: false,
+                capacity: 0,
             }
         },
         methods: {
@@ -187,6 +208,9 @@
                         this.tcList = util.safe(data, 'data.tcList', []);
 
                         for (let i = 0; i < this.tcList.length; i++) {
+                            this.tcList[i].marginAndCap = this.tcList[i].margin + '/'+this.tcList[i].capacity
+                            this.tcList[i].start = util.formatDateTime(this.tcList[i].startSelectTime)
+                            this.tcList[i].end = util.formatDateTime(this.tcList[i].endSelectTime)
                         }
 
                         this.total = util.safe(data, 'data.total', 0);
@@ -218,16 +242,12 @@
             selectionChange(selection) {
                 this.selection = selection
             },
-            deleteTea(index) {
-                this.$Modal.confirm({
-                    nature: '删除选中的选课',
-                    content: '确定删除选中的选课，删除后不可恢复',
-                    onOk: () => {
-                        let ids = [];
-                        ids.push(this.tcList[index].id);
-                        this.delete(ids);
-                    }
-                })
+            getSelectIds() {
+                let ids = [];
+                for (let i = 0; i < this.selection.length; i++) {
+                    ids.push(this.selection[i].id);
+                }
+                return ids;
             },
             delete(ids) {
                 TcApi.delete(ids).then(({data}) => {
@@ -239,10 +259,24 @@
                     }
                 })
             },
-            changePage() {
+            updateBatch(upData) {
+                TcApi.updateBatch(upData).then(({data}) => {
+                    if (data.code === this.$code.SUCCESS) {
+                        this.$Message.success('修改成功');
+                        this.capModel = false;
+                        this.selectTimeModel = false;
+                        this.doSearch();
+                    } else {
+                        return this.$Message.error(data.msg)
+                    }
+                })
+            },
+            changePage(page) {
+                this.selectCond.page = page;
                 this.doSearch();
             },
-            changePageSize() {
+            changePageSize(size) {
+                this.selectCond.pageSize = size;
                 this.doSearch();
             },
             condSelectChange() {
@@ -251,6 +285,25 @@
             tabsChange(name) {
                 this.selectCond.selectState = name;
                 this.doSearch();
+            },
+            setSelectTime() {
+                this.selectTimeModel = true;
+            },
+            setCap() {
+                this.capModel = true;
+            },
+            modelOk(which) {
+                if (which === 'cap') {
+                    this.updateBatch({ids: this.getSelectIds(), tc: {capacity: this.capacity}});
+                } else {
+                    this.updateBatch({ids: this.getSelectIds(), tc: {
+                        startSelectTime: this.selectTimeStr[0].getTime(),
+                        endSelectTime: this.selectTimeStr[1].getTime(),
+                    }});
+                }
+            },
+            setSelectState(state) {
+                this.updateBatch({ids: this.getSelectIds(), tc: {status: state}});
             }
         },
         mounted() {
@@ -259,3 +312,4 @@
         }
     }
 </script>
+
