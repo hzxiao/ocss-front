@@ -3,10 +3,11 @@ import httpUtil from '../libs/httpUtil'
 export default {
     url: '/teachers/',
     list(params) {
-        let options = httpUtil.createOption(params);
+        // let options = httpUtil.createOption(params);
         return httpUtil.fetch({
-            url: this.url +'list' + options,
-            method: 'get'
+            url: this.url +'list',
+            method: 'get',
+            params
         })
     },
     fetchData(params) {

@@ -184,7 +184,7 @@
                     }
                 })
             },
-            selectChange() {
+            handleSelectChange() {
                 if (!this.form.dept) {
                     return
                 }

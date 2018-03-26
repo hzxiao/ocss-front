@@ -47,18 +47,10 @@
 
         </div>
         <Tabs value="0" type="card" @on-click="tabsChange" :animated="false">
-            <TabPane label="全部" name="0">
-
-            </TabPane>
-            <TabPane label="选课中" name="1">
-
-            </TabPane>
-            <TabPane label="未开始" name="2">
-
-            </TabPane>
-            <TabPane label="已结束" name="3">
-
-            </TabPane>
+            <TabPane label="全部" name="0"></TabPane>
+            <TabPane label="选课中" name="1"></TabPane>
+            <TabPane label="未开始" name="2"></TabPane>
+            <TabPane label="已结束" name="3"></TabPane>
         </Tabs>
         <div class="op-menu">
             <Button type="default" @click="doExport()" :disabled="selection.length == 0">批量导出</Button>
@@ -112,11 +104,11 @@
                     width: 60,
                     align: 'center'
                 }, {
-                    title: '课程',
+                    title: '课程名称',
                     key: 'courseName'
                 }, {
                     title: '任课老师',
-                    key: 'name'
+                    key: 'teacherName'
                 }, {
                     title: '开课学院',
                     key: 'deptName'

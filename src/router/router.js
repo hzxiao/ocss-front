@@ -469,7 +469,7 @@ export const appRouter = [{
                 title: '添加选课',
                 name: 'add-teach-course',
                 component: () =>
-                    import ('@/views/abstract.vue')
+                    import ('@/views/manage-teach-course/add-tc.vue')
             }
         ]
     },
@@ -539,6 +539,22 @@ export const appRouter = [{
             name: 'select-course',
             component: () =>
                 import ('@/views/abstract.vue')
+        }]
+    },
+    {
+        path: '/playground',
+        title: 'Playground',
+        name: 'playground',
+        component: Main,
+        meta: {
+            roles: [1]
+        },
+        children: [{
+            path: 'index',
+            title: 'playground',
+            name: '0',
+            component: () =>
+                import('@/views/playground/index.vue')
         }]
     }
 ];

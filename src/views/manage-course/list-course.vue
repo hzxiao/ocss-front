@@ -48,7 +48,7 @@
 </template>
 
 <script>
-    import {CourseApi, TeacherApi} from '../../api'
+    import {CourseApi} from '../../api'
     import util from '../../libs/util';
 
     export default {

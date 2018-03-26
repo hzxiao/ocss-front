@@ -56,11 +56,10 @@ const user = {
         }
     },
     actions: {
-        login({ _, commit }, data) {
-            console.log(data)
+        login({ commit }, data) {
             commit(types.SET_USER, data.user)
         },
-        logout({ _, commit }) {
+        logout({ commit }) {
             commit(types.CLEAR_USER)
         }
     }
