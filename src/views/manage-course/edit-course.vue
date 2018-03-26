@@ -24,21 +24,21 @@
                         </div>
                         <div class="right-side">
                             <FormItem label="归属" prop="attr">
-                                <Select v-model="formValidate.attr" placeholder="选择归属" @on-change="selectChange('dept')">
+                                <Select v-model="formValidate.attr" placeholder="选择归属" @on-change="handleSelectChange('dept')">
                                     <Option v-for="item in attrList" :value="item.id" :key="item.id">
                                         {{ item.name}}
                                     </Option>
                                 </Select>
                             </FormItem>
                             <FormItem label="性质" prop="nature">
-                                <Select v-model="formValidate.nature" placeholder="选择性质" @on-change="selectChange('dept')">
+                                <Select v-model="formValidate.nature" placeholder="选择性质" @on-change="handleSelectChange('dept')">
                                     <Option v-for="item in natureList" :value="item.id" :key="item.id">
                                         {{ item.name}}
                                     </Option>
                                 </Select>
                             </FormItem>
                             <FormItem label="校区" prop="campus">
-                                <Select v-model="formValidate.campus" placeholder="选择校区" @on-change="selectChange('major')">
+                                <Select v-model="formValidate.campus" placeholder="选择校区" @on-change="handleSelectChange('major')">
                                     <Option v-for="item in campusList" :value="item.id" :key="item.id">
                                         {{ item.name }}
                                     </Option>

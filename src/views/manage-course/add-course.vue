@@ -11,7 +11,7 @@
                         <Input v-model="formValidate.name" placeholder="输入课程名称"></Input>
                     </FormItem>
                     <FormItem label="学分" prop="credit">
-                        <InputNumber v-model="formValidate.credit" :min="1" :max="20" placeholder="输入学分"></InputNumber>
+                        <InputNumber v-model="formValidate.credit" :min="1" :max="20" :step="0.5" placeholder="输入学分"></InputNumber>
                     </FormItem>
                     <FormItem label="学时" prop="period">
                         <Input v-model="formValidate.period" placeholder="输入学时"></Input>
@@ -62,7 +62,7 @@
                 formValidate: {
                     name: '',
                     dept: '',
-                    credit: '',
+                    credit: 0,
                     period: '',
                     attr: '',
                     nature: '',
@@ -104,7 +104,7 @@
             initCondition() {
 
             },
-            selectChange(which) {
+            handleSelectChange(which) {
                 switch (which) {
                     case 'attr':
                         break;
@@ -118,7 +118,7 @@
                 }
             },
             handleSubmit () {
-                this.$refs.formValidate.validate((valid) => {
+                this.$refs.formValues.validate((valid) => {
                     if (!valid) {
                         return
                     }
@@ -134,7 +134,7 @@
                 })
             },
             handleReset () {
-                this.$refs.formValidate.resetFields()
+                this.$refs.formValues.resetFields()
             }
         },
         mounted() {

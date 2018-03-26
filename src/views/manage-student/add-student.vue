@@ -153,7 +153,7 @@
                     }
                 })
             },
-            selectChange(which) {
+            handleSelectChange(which) {
                 switch (which) {
                     case "dept":
                         if (!this.formValidate.deptId) {

@@ -101,7 +101,7 @@ const httpUtil = {
 
         if (page && pageSize) {
             page--
-            options = options + 'page=' + parseInt(page, 10) + '&pageSize=' + parseInt(size, 10)
+            options = options + 'page=' + parseInt(page, 10) + '&pageSize=' + parseInt(pageSize, 10)
         }
 
         let sort = null
@@ -153,26 +153,27 @@ const httpUtil = {
     },
     createOption: function (o) {
         let obj = JSON.parse(JSON.stringify(o));
-        let options = '?';
-        for (let k in obj) {
-            if (k === 'page' && obj[k] > 0) {
-                obj[k] = obj[k] - 1;
-            }
-            options = options + k +'=' + obj[k]+'&';
-        }
-        return options.substring(0, options.length-1);
-        //
-        // if (!obj) return;
-        // const params = Object.keys(obj)
-        //     .map(key => obj[key]
-        //         ? key === 'page'
-        //             ? `${key}=${obj[key] - 1}`
-        //             : `${key}=${obj[key] - 1}`
-        //         : '')  // {key: val, someKey: ''} -> ["key=val", ""] produce string of "key=val" or empty "" if non val is provided
-        //     .filter(s => s)  // clean empty string
-        //     .join('&')
-        // return '?' + params
+        // let options = '?';
+        // for (let k in obj) {
+        //     if (k === 'page' && obj[k] > 0) {
+        //         obj[k] = obj[k] - 1;
+        //     }
+        //     options = options + k +'=' + obj[k]+'&';
+        // }
+        // return options.substring(0, options.length-1);*/
+
+        if (!obj) return;
+        const params = Object.keys(obj)
+            .map(key => obj[key]
+                ? key === 'page'
+                    ? `${key}=${obj[key] - 1}`
+                    : `${key}=${obj[key]}`
+                : '')  // {key: val, someKey: ''} -> ["key=val", ""] produce string of "key=val" or empty "" if non val is provided
+            .filter(s => s)  // clean empty string
+            .join('&')
+        return '?' + params
     }
 }
 
+export { axios }
 export default httpUtil

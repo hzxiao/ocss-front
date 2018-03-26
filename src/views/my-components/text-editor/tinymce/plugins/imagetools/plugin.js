@@ -3001,7 +3001,7 @@ define(
               });
 
               updateElementRect('top', { x: viewPortRect.x, y: viewPortRect.y, w: viewPortRect.w, h: rect.y - viewPortRect.y });
-              updateElementRect('right', { x: rect.x + rect.w, y: rect.y, w: viewPortRect.w - rect.x - rect.w + viewPortRect.x, h: rect.h });
+              updateElementRect('right', { x: rect.x + rect.w, y: rect.y, w: viewPortRect.sectionGroup - rect.x - rect.sectionGroup + viewPortRect.x, h: rect.h });
               updateElementRect('bottom', {
                   x: viewPortRect.x,
                   y: rect.y + rect.h,

@@ -296,4 +296,8 @@ util.formatDateTime = function (inputTime) {
     return y + '-' + m + '-' + d+' '+h+':'+minute+':'+second;
 };
 
+util.validate = () => {
+
+}
+
 export default util;

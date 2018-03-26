@@ -707,7 +707,7 @@ jsc */
           var paddedContentRect = {
               x: contentAreaRect.x,
               y: contentAreaRect.y,
-              w: contentAreaRect.w + (contentAreaRect.w < (panelRect.w + targetRect.w) ? panelRect.w : 0),
+              w: contentAreaRect.w + (contentAreaRect.sectionGroup < (panelRect.sectionGroup + targetRect.sectionGroup) ? panelRect.sectionGroup : 0),
               h: contentAreaRect.h + (contentAreaRect.h < (panelRect.h + targetRect.h) ? panelRect.h : 0)
           };
 
@@ -3642,7 +3642,7 @@ jsc */
           // Compare last layout rect with the current one to see if we need to repaint or not
                   lastLayoutRect = self._lastLayoutRect;
                   if (lastLayoutRect.x !== curRect.x || lastLayoutRect.y !== curRect.y ||
-            lastLayoutRect.w !== curRect.w || lastLayoutRect.h !== curRect.h) {
+            lastLayoutRect.w !== curRect.sectionGroup || lastLayoutRect.h !== curRect.h) {
                       repaintControls = Control.repaintControls;
 
                       if (repaintControls) {
@@ -3696,7 +3696,7 @@ jsc */
                   lastRepaintRect.y = rect.y;
               }
 
-              if (rect.w !== lastRepaintRect.w) {
+              if (rect.w !== lastRepaintRect.sectionGroup) {
                   value = round(rect.w - borderW);
                   style.width = (value >= 0 ? value : 0) + 'px';
                   lastRepaintRect.w = rect.w;
@@ -4718,11 +4718,11 @@ jsc */
                   var pos = calculateRelativePosition(this, elm, rels[i]);
 
                   if (this.state.get('fixed')) {
-                      if (pos.x > 0 && pos.x + pos.w < viewPortRect.w && pos.y > 0 && pos.y + pos.h < viewPortRect.h) {
+                      if (pos.x > 0 && pos.x + pos.w < viewPortRect.sectionGroup && pos.y > 0 && pos.y + pos.h < viewPortRect.h) {
                           return rels[i];
                       }
                   } else {
-                      if (pos.x > viewPortRect.x && pos.x + pos.w < viewPortRect.w + viewPortRect.x &&
+                      if (pos.x > viewPortRect.x && pos.x + pos.w < viewPortRect.sectionGroup + viewPortRect.x &&
               pos.y > viewPortRect.y && pos.y + pos.h < viewPortRect.h + viewPortRect.y) {
                           return rels[i];
                       }
@@ -4794,7 +4794,7 @@ jsc */
                   var viewPortRect = DomUtils.getViewPort(window);
                   var layoutRect = self.layoutRect();
 
-                  x = constrain(x, viewPortRect.w + viewPortRect.x, layoutRect.w);
+                  x = constrain(x, viewPortRect.w + viewPortRect.x, layoutRect.sectionGroup);
                   y = constrain(y, viewPortRect.h + viewPortRect.y, layoutRect.h);
               }
 
@@ -6454,7 +6454,7 @@ jsc */
           recalc: function () {
               var self = this, rect = self._layoutRect, lastRect = self._lastRect;
 
-              if (!lastRect || lastRect.w != rect.w || lastRect.h != rect.h) {
+              if (!lastRect || lastRect.w != rect.sectionGroup || lastRect.h != rect.h) {
                   self._layout.recalc(self);
                   rect = self.layoutRect();
                   self._lastRect = { x: rect.x, y: rect.y, w: rect.w, h: rect.h };
@@ -7583,7 +7583,7 @@ jsc */
                       self.classes.remove('fullscreen');
                       self.moveTo(self._initial.x, self._initial.y).resizeTo(self._initial.w, self._initial.h);
                   } else {
-                      self._initial = { x: layoutRect.x, y: layoutRect.y, w: layoutRect.w, h: layoutRect.h };
+                      self._initial = { x: layoutRect.x, y: layoutRect.y, w: layoutRect.sectionGroup, h: layoutRect.h };
 
                       self.borderBox = BoxUtils.parseBox('0');
                       self.getEl('head').style.display = 'none';
@@ -18348,7 +18348,7 @@ jsc */
                   lastRepaintRect.y = rect.y;
               }
 
-              if (rect.w !== lastRepaintRect.w) {
+              if (rect.w !== lastRepaintRect.sectionGroup) {
                   style.width = (rect.w - borderW) + 'px';
                   lastRepaintRect.w = rect.w;
               }

@@ -130,7 +130,7 @@
                     width: 60,
                     align: 'center'
                 }, {
-                    title: '课程',
+                    title: '课程名称',
                     key: 'courseName'
                 }, {
                     title: '任课老师',

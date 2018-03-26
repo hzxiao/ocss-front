@@ -18,7 +18,7 @@
                                 <Col span="16" style="padding-left:6px;">
                                     <Row class-name="made-child-con-middle" type="flex" align="middle">
                                         <div>
-                                            <b class="card-user-infor-name">Admin</b>
+                                            <b class="card-user-infor-name">{{ 'i' }}</b>
                                             <p>super admin</p>
                                         </div>
                                     </Row>
@@ -70,12 +70,12 @@
                 <Row :gutter="5">
                     <Col :xs="24" :sm="12" :md="6" :style="{marginBottom: '10px'}">
                         <infor-card
-                            id-name="user_created_count"
-                            :end-val="count.createUser"
-                            iconType="android-person-add"
-                            color="#2d8cf0"
-                            intro-text="今日新增用户"
-                        ></infor-card>
+                                id-name="user_created_count"
+                                :end-val="count.createUser"
+                                iconType="android-person-add"
+                                color="#2d8cf0"
+                                intro-text="今日新增用户"
+                        />
                     </Col>
                     <Col :xs="24" :sm="12" :md="6" :style="{marginBottom: '10px'}">
                         <infor-card
@@ -256,6 +256,9 @@ export default {
             this.showAddNewTodo = false;
             this.newToDoItemValue = '';
         }
+    },
+    mounted () {
+        this.$store.dispatch('batchRequest', ['teachers', 'tc', 'courses'])
     }
 };
 </script>
