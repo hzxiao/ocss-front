@@ -83,5 +83,19 @@ export default {
             url: this.url + id,
             method: 'get'
         })
-    }
+    },
+    listStuCourse(params) {
+        let options = httpUtil.createOption(params);
+        return httpUtil.fetch({
+            url: this.url +'stu/courses' + options,
+            method: 'get'
+        })
+    },
+    stuSelectCourse(data) {
+        return httpUtil.fetch({
+            url: this.url+'stu/selectCourse',
+            method: 'post',
+            data
+        })
+    },
 }

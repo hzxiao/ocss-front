@@ -521,7 +521,7 @@ export const appRouter = [{
             title: '我的课程',
             name: 'list-student-course',
             component: () =>
-                import ('@/views/abstract.vue')
+                import ('@/views/student-page/student-course.vue')
         }]
     },
     {
@@ -538,7 +538,7 @@ export const appRouter = [{
             title: '选课中心',
             name: 'select-course',
             component: () =>
-                import ('@/views/abstract.vue')
+                import ('@/views/student-page/select-course-center.vue')
         }]
     }
 ];
