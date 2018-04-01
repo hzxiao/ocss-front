@@ -540,6 +540,23 @@ export const appRouter = [{
             component: () =>
                 import ('@/views/student-page/select-course-center.vue')
         }]
+    },
+    {
+        path: '/teach-course-detail',
+        icon: 'android-sad',
+        title: '课程详情',
+        name: 'teach-course-detail',
+        component: Main,
+        meta: {
+            roles: [5]
+        },
+        children: [{
+            path: 'index',
+            title: '课程详情',
+            name: 'teach-course-detail-adm',
+            component: () =>
+              import ('@/views/manage-teach-course/teach-course-detail.vue')
+        }]
     }
 ];
 

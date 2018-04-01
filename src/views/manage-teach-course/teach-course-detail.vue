@@ -1,103 +1,42 @@
 <style lang="less">
-    @import './list-tc.less';
+    @import './teach-course-detail.less';
 </style>
 
 <template>
     <div class="st">
-        <div class="search">
-            <Input v-model="selectCond.name" icon="search" placeholder="输入课程名称" style="width: 200px"/>
-            <Button type="primary" shape="circle" icon="ios-search" @click="doSearch()">搜索</Button>
-        </div>
 
-        <div class="condition">
-            <div class="cond-item">
-                <p>学院：</p>
-                <Select v-model="selectCond.deptId" filterable clearable @on-change="condSelectChange()">
-                    <Option v-for="item in deptList" :value="item.id" :key="item.id">
-                        {{ item.name}}
-                    </Option>
-                </Select>
-            </div>
-
-            <div class="cond-item">
-                <p>可选状态：</p>
-                <Select v-model="selectCond.status" filterable clearable @on-change="condSelectChange()">
-                    <Option v-for="item in stateList" :value="item.id" :key="item.id">
-                        {{ item.name }}
-                    </Option>
-                </Select>
-            </div>
-            <div class="cond-item">
-                <p>性质：</p>
-                <Select v-model="selectCond.nature" filterable clearable @on-change="condSelectChange()">
-                    <Option v-for="item in natureList" :value="item" :key="item">
-                        {{ item }}
-                    </Option>
-                </Select>
-            </div>
-            <div class="cond-item">
-                <p>归属：</p>
-                <Select v-model="selectCond.attr" filterable clearable @on-change="condSelectChange()">
-                    <Option v-for="item in attrList" :value="item" :key="item">
-                        {{ item }}
-                    </Option>
-                </Select>
-            </div>
-
-
-        </div>
         <Tabs value="0" type="card" @on-click="tabsChange" :animated="false">
-            <TabPane label="全部" name="0">
+            <TabPane label="基本信息" name="0">
 
             </TabPane>
-            <TabPane label="选课中" name="2">
+            <TabPane label="选课学生" name="2">
+                <div class="op-menu">
+                    <Button type="default" @click="doExport()" >增加学生</Button>
+                    <Button type="default" @click="doDeleteBatch()" :disabled="selection.length == 0">剔除学生</Button>
+                </div>
+
+                <Table ref="table" :loading="tableLoading" :data="tcList" :columns="tableColumns"
+                       @on-selection-change="selectionChange" stripe>
+                    <div slot="footer" style="padding-left:5px">
+                        <Page :total="total" :current="selectCond.page"
+                              size="small"
+                              :page-size="selectCond.pageSize"
+                              placement="top"
+                              @on-change="changePage"
+                              @on-page-size-change="changePageSize"
+                              show-elevator show-total show-sizer></Page>
+                    </div>
+                </Table>
 
             </TabPane>
-            <TabPane label="未开始" name="3">
+            <TabPane label="课程留言" name="3">
 
             </TabPane>
-            <TabPane label="已结束" name="1">
+            <TabPane label="课件" name="1">
 
             </TabPane>
         </Tabs>
-        <div class="op-menu">
-            <Button type="default" @click="doExport()" :disabled="selection.length == 0">批量导出</Button>
-            <Button type="default" @click="doDeleteBatch()" :disabled="selection.length == 0">批量删除</Button>
-            <Button type="default" @click="setCap()" :disabled="selection.length == 0">设置容量</Button>
-            <Button type="default" @click="setSelectTime()" :disabled="selection.length == 0">设置选课时间</Button>
-            <Button type="default" @click="setSelectState(1)" :disabled="selection.length == 0">设置可选</Button>
-            <Button type="default" @click="setSelectState(2)" :disabled="selection.length == 0">设置不可选</Button>
-        </div>
 
-        <Table ref="table" :loading="tableLoading" :data="tcList" :columns="tableColumns"
-               @on-selection-change="selectionChange" stripe>
-            <div slot="footer" style="padding-left:5px">
-                <Page :total="total" :current="selectCond.page"
-                      size="small"
-                      :page-size="selectCond.pageSize"
-                      placement="top"
-                      @on-change="changePage"
-                      @on-page-size-change="changePageSize"
-                      show-elevator show-total show-sizer></Page>
-            </div>
-        </Table>
-
-        <Modal
-                v-model="selectTimeModel"
-                title="设置选课时间"
-                loading
-                @on-ok="modelOk('')">
-            <DatePicker type="datetimerange" v-model="selectTimeStr" format="yyyy-MM-dd HH:mm" placeholder="选择选课起始结束时间" style="width: 300px"></DatePicker>
-
-        </Modal>
-
-        <Modal
-                v-model="capModel"
-                title="设置容量"
-                loading
-                @on-ok="modelOk('cap')">
-            <InputNumber v-model="capacity" :min="1" :max="150" placeholder="输入容量"></InputNumber>
-        </Modal>
     </div>
 
 </template>
@@ -130,30 +69,27 @@
                     width: 60,
                     align: 'center'
                 }, {
-                    title: '课程',
-                    key: 'courseName'
+                    title: '学号',
+                    key: 'id'
                 }, {
-                    title: '任课老师',
-                    key: 'teacherName'
+                    title: '姓名',
+                    key: 'name'
                 }, {
-                    title: '开课学院',
+                    title: '学院',
                     key: 'deptName'
                 }, {
-                    title: '余量/总量',
-                    key: 'marginAndCap'
+                    title: '专业',
+                    key: 'majorName'
                 }, {
-                    title: '开始选课时间',
-                    key: 'start'
+                    title: '年级',
+                    key: 'schoolYear'
                 }, {
-                    title: '结束选课时间',
-                    key: 'end'
-                },  {
-                    title: '性质',
-                    key: 'nature'
+                    title: '班级',
+                    key: 'class'
                 }, {
-                    title: '归属',
-                    key: 'attr'
-                },{
+                    title: '选课时间',
+                    key: 'selectTime'
+                }, {
                     title: 'Action',
                     key: 'action',
                     width: 150,
@@ -162,23 +98,25 @@
                         return h('div', [
                             h(
                                 'Button', {
-                                    props: {type: 'primary', size: 'small'}, style: {marginRight: '5px'},
+                                    props: {type: 'primary', size: 'small'},
+                                    style: {marginRight: '5px'},
                                     on: {
                                         click: () => {
-                                            this.$router.push({name: 'edit-teacher', params: {id: this.tcList[params.index].id}});
+                                            this.$router.push({name: 'edit-student', params: {id: this.stuList[params.index].id}});
                                         }
-                                    }},
-                                '进入编辑'
+                                    }
+                                },
+                                '编辑'
                             ),
                             h(
-                                'Button', {
-                                    props: {type: 'primary', size: 'small'}, style: {marginRight: '5px'},
+                                'Button', {props: {type: 'error', size: 'small'},
                                     on: {
                                         click: () => {
-                                            this.$router.push({name: 'teach-course-detail-adm', params: {id: this.tcList[params.index].id}});
+                                            this.deleteStu(params.index)
                                         }
-                                    }},
-                                '查看'
+                                    }
+                                },
+                                '剔除'
                             )
                         ])
                     }
