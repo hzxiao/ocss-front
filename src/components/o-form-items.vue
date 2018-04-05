@@ -12,11 +12,10 @@
                     {{ item.name }}</Option>
             </Select>
 
-            <AutoComplete v-else-if="fields.type === 'search'"
+            <Input v-else-if="fields.type === 'search'"
                           v-model="fields.value"
-                          :data="filteredSearchData[key]"
                           :placeholder="fields.placeholder"
-                          @on-search="handleSearch(key, fields.value)"></AutoComplete>
+                            @on-focus="handleFocus(fields)"/>
 
             <DatePicker v-else-if="fields.type === 'date'"
                         v-model="fields.model"
@@ -85,6 +84,9 @@
 
             handleArrayChange (fields) {
                 console.log(fields)
+            },
+            handleFocus(fields) {
+                this.$emit('on-focus', fields)
             }
         }
     }

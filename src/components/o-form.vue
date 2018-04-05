@@ -8,6 +8,7 @@
                             :items="formData.left"
                             :filtered-search-data="filteredSearchData"
                             @on-search="handleSearch"
+                            @on-focus="handleFocus"
                             @on-select-change="handleSelectChange"
                             @on-date-change="handleDateChange"></oFormItems>
                     <slot name="left-end"></slot>
@@ -98,6 +99,9 @@
 
             getSearchData () {
                 return JSON.parse(JSON.stringify(this.searchData))
+            },
+            handleFocus(fields) {
+                this.$emit('on-focus', fields)
             }
         }
     }
