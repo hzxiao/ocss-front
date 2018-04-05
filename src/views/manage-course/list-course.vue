@@ -12,15 +12,7 @@
         <div class="condition">
             <div class="cond-item">
                 <p>学院：</p>
-                <Select v-model="selectCond.dept" filterable clearable @on-change="condSelectChange()">
-                    <Option v-for="item in deptList" :value="item.id" :key="item.id">
-                        {{ item.name }}
-                    </Option>
-                </Select>
-            </div>
-            <div class="cond-item">
-                <p>专业：</p>
-                <Select v-model="selectCond.dept" filterable clearable @on-change="condSelectChange()">
+                <Select v-model="selectCond.deptId" filterable clearable @on-change="condSelectChange()">
                     <Option v-for="item in deptList" :value="item.id" :key="item.id">
                         {{ item.name }}
                     </Option>
@@ -48,7 +40,7 @@
 </template>
 
 <script>
-    import {CourseApi} from '../../api'
+    import {CourseApi, DeptApi} from '../../api'
     import util from '../../libs/util';
 
     export default {
@@ -80,10 +72,10 @@
                     key: 'name'
                 }, {
                     title: '学院',
-                    key: 'dept.name'
+                    key: 'deptName'
                 }, {
-                    title: '专业',
-                    key: 'dept.major'
+                    title: '归属',
+                    key: 'attr'
                 }, {
                     title: '学分',
                     key: 'credit'
@@ -103,7 +95,7 @@
                                     style: {marginRight: '5px'},
                                     on: {
                                         click: () => {
-                                            this.$router.push({name: 'edit-course', params: {id: this.teacherList[params.index].id}});
+                                            this.$router.push({name: 'edit-course', params: {id: this.courses[params.index].id}});
                                         }
                                     }},
                                 '编辑'
@@ -126,18 +118,28 @@
         },
         methods: {
             initCondition() {
-
+                DeptApi.listAll().then(({ data }) => {
+                    if (data.code === this.$code.SUCCESS) {
+                        this.deptList = util.safe(data, 'data.deptList', [])
+                    } else {
+                        return this.$Message.error(data.msg)
+                    }
+                })
             },
 
             doSearch() {
-                this.tableLoading = true
-                this.selectCond.id = this.searchText
-                this.selectCond.name = this.searchText
+                this.tableLoading = true;
+                this.selectCond.id = this.searchText;
+                this.selectCond.name = this.searchText;
 
                 CourseApi.list(this.selectCond).then(({data}) => {
                     if (data.code === this.$code.SUCCESS) {
-                        this.courses = util.safe(data, 'data.courseList', [])
+                        this.courses = util.safe(data, 'data.courseList', []);
                         this.tableLoading = false;
+                        for (let i = 0; i < this.courses.length; i++) {
+                            this.courses[i].deptName = this.courses[i].dept.name;
+                        }
+                        this.total = util.safe(data, 'data.total', 0);
                     } else {
                         this.tableLoading = false;
                         return this.$Message.error(data.msg)
@@ -176,18 +178,20 @@
                     }
                 })
             },
-            changePage() {
-                this.doSearch()
+            changePage(page) {
+                this.selectCond.page = page;
+                this.doSearch();
             },
-            changePageSize() {
-                this.doSearch()
+            changePageSize(size) {
+                this.selectCond.pageSize = size;
+                this.doSearch();
             },
             condSelectChange() {
                 this.doSearch()
             }
         },
         mounted() {
-            this.initCondition()
+            this.initCondition();
             this.doSearch()
         }
     }

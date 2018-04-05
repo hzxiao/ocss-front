@@ -54,5 +54,12 @@ export default {
             method: 'post',
             data
         })
+    },
+
+    getById(id) {
+        return httpUtil.fetch({
+            url: this.url + id,
+            method: 'get'
+        })
     }
 }
