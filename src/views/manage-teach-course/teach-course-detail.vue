@@ -5,50 +5,86 @@
 <template>
     <div class="st">
 
-        <Tabs value="0" type="card" @on-click="tabsChange" :animated="false">
+        <Tabs :value="tabValue" type="card" @on-click="tabsChange" :animated="false">
             <TabPane label="基本信息" name="0">
-
+                <Card class="crs-info-card">
+                    <p slot="title">
+                        <Icon type="person"></Icon>
+                        课程信息
+                    </p>
+                    <div class="info" v-for="item in courseInfo">
+                        <span>{{ item.label }}</span>
+                        <span>{{ item.value }}</span>
+                    </div>
+                </Card>
+                <Card class="teacher-info-card">
+                    <p slot="title">
+                        <Icon type="person"></Icon>
+                        教师信息
+                    </p>
+                    <div class="info" v-for="item in teacherInfo">
+                        <span>{{ item.label }}</span>
+                        <span>{{ item.value }}</span>
+                    </div>
+                </Card>
             </TabPane>
-            <TabPane label="选课学生" name="2">
+            <TabPane label="选课学生" name="1">
                 <div class="op-menu">
-                    <Button type="default" @click="doExport()" >增加学生</Button>
-                    <Button type="default" @click="doDeleteBatch()" :disabled="selection.length == 0">剔除学生</Button>
+                    <Button type="default" @click="handleAddStuForTc()">增加学生</Button>
                 </div>
 
-                <Table ref="table" :loading="tableLoading" :data="tcList" :columns="tableColumns"
+                <Table ref="table" :loading="tableLoading" :data="studentList" :columns="tableColumns"
                        @on-selection-change="selectionChange" stripe>
-                    <div slot="footer" style="padding-left:5px">
-                        <Page :total="total" :current="selectCond.page"
-                              size="small"
-                              :page-size="selectCond.pageSize"
-                              placement="top"
-                              @on-change="changePage"
-                              @on-page-size-change="changePageSize"
-                              show-elevator show-total show-sizer></Page>
-                    </div>
                 </Table>
 
             </TabPane>
-            <TabPane label="课程留言" name="3">
+            <TabPane label="课程留言" name="2">
 
             </TabPane>
-            <TabPane label="课件" name="1">
+            <TabPane label="课件" name="3">
 
             </TabPane>
         </Tabs>
+
+        <Modal
+                v-model="selectModel"
+                title="添加学生"
+                @on-cancel="modelCancel"
+                @on-ok="modelOk()">
+            <div class="search" style="margin-bottom:20px">
+                <Input v-model="searchText" icon="search" placeholder="输入学生学号或姓名" style="width: 200px"/>
+                <Button type="primary" shape="circle" icon="ios-search" @click="doSearch()">搜索</Button>
+            </div>
+
+            <Table highlight-row ref="currentRowTable" height="400" width="500" :columns="modelTableCol"
+                   :data="tableData"
+                   @on-current-change="handleCurrentRowChange">
+                <div slot="footer" style="padding-left:5px">
+                    <Page :total="total" :current="page"
+                          size="small"
+                          :page-size="pageSize"
+                          placement="top"
+                          @on-change="changePage"
+                          @on-page-size-change="changePageSize"
+                          show-elevator show-total show-sizer></Page>
+                </div>
+            </Table>
+
+        </Modal>
 
     </div>
 
 </template>
 
 <script>
-    import {DeptApi, TcApi} from '../../api'
+    import {StudentApi, TcApi} from '../../api'
     import util from '../../libs/util';
     import {attrList, natureList} from '../../libs/data';
 
     export default {
         data() {
             return {
+                currentId: '',
                 total: 0,
                 tableLoading: false,
                 selection: [],
@@ -65,10 +101,6 @@
                     sort: '-create'
                 },
                 tableColumns: [{
-                    type: 'selection',
-                    width: 60,
-                    align: 'center'
-                }, {
                     title: '学号',
                     key: 'id'
                 }, {
@@ -97,31 +129,35 @@
                     render: (h, params) => {
                         return h('div', [
                             h(
-                                'Button', {
-                                    props: {type: 'primary', size: 'small'},
-                                    style: {marginRight: '5px'},
-                                    on: {
-                                        click: () => {
-                                            this.$router.push({name: 'edit-student', params: {id: this.stuList[params.index].id}});
-                                        }
-                                    }
-                                },
-                                '编辑'
+                              'Button', {
+                                  props: {type: 'primary', size: 'small'},
+                                  style: {marginRight: '5px'},
+                                  on: {
+                                      click: () => {
+                                          this.$router.push({
+                                              name: 'edit-student',
+                                              params: {id: this.studentList[params.index].id}
+                                          });
+                                      }
+                                  }
+                              },
+                              '编辑'
                             ),
                             h(
-                                'Button', {props: {type: 'error', size: 'small'},
-                                    on: {
-                                        click: () => {
-                                            this.deleteStu(params.index)
-                                        }
-                                    }
-                                },
-                                '剔除'
+                              'Button', {
+                                  props: {type: 'error', size: 'small'},
+                                  on: {
+                                      click: () => {
+                                          this.deleteStuOfTc(this.studentList[params.index].id)
+                                      }
+                                  }
+                              },
+                              '剔除'
                             )
                         ])
                     }
                 }],
-                tcList: [],
+                studentList: [],
                 deptList: [],
                 natureList,
                 attrList,
@@ -136,29 +172,130 @@
                 selectTimeStr: '',
                 capModel: false,
                 capacity: 0,
+                courseInfo: [],
+                teacherInfo: [],
+                tabValue: '0',
+
+                selectModel: false,
+                page: 1,
+                pageSize: 20,
+                tableData: [],
+                currentSelectId: '',
+                modelTableCol: [
+                    {
+                        title: '学号',
+                        key: 'id'
+                    },
+                    {
+                        title: '姓名',
+                        key: 'name'
+                    },
+                    {
+                        title: '学院',
+                        key: 'deptName'
+                    }
+                ],
             }
         },
         methods: {
-            initCondition() {
-                DeptApi.listAll().then(({data}) => {
+            doSearch() {
+                switch (this.tabValue) {
+                    case '0':
+                        this.getBasicInfo();
+                        break;
+                    case '1':
+                        this.getStuOfTc();
+                        break;
+                    case '2':
+                        break;
+                    case '3':
+                        break;
+                }
+            },
+            doExport() {
+                this.$refs.table.exportCsv({
+                    filename: '选课信息'
+                })
+            },
+
+            deleteStuOfTc(id) {
+                TcApi.updateStuForTc({method: 'cancel', id: this.currentId, sid: id}).then(({data}) => {
                     if (data.code === this.$code.SUCCESS) {
-                        this.deptList = util.safe(data, 'data.deptList', [])
+                        this.$Message.success('删除成功')
+                        this.doSearch();
                     } else {
                         return this.$Message.error(data.msg)
                     }
-                });
+                })
+            },
+            addStuOfTc(id) {
+                TcApi.updateStuForTc({method: 'select', id: this.currentId, sid: id}).then(({data}) => {
+                    if (data.code === this.$code.SUCCESS) {
+                        this.$Message.success('添加成功');
+                        this.doSearch();
+                    } else {
+                        return this.$Message.error(data.err)
+                    }
+                })
+            },
+            changePage(page) {
+                this.page = page;
+                this.listAllStu();
+            },
+            changePageSize(size) {
+                this.pageSize = size;
+                this.listAllStu();
+            },
+            tabsChange(name) {
+                this.tabValue = name;
+                this.doSearch();
             },
 
-            doSearch() {
-                this.tableLoading = true;
-                TcApi.list(this.selectCond).then(({data}) => {
+            getBasicInfo() {
+                TcApi.getById(this.currentId).then(({data}) => {
                     if (data.code === this.$code.SUCCESS) {
-                        this.tcList = util.safe(data, 'data.tcList', []);
+                        var tc = util.safe(data, 'data.tc', {});
+                        var course = util.safe(data, 'data.course', {});
+                        var teacher = util.safe(data, 'data.teacher', {});
+                        this.courseInfo = [];
+                        this.courseInfo.push({label: '课程代码: ', value: course.id});
+                        this.courseInfo.push({label: '课程名称: ', value: course.name});
+                        this.courseInfo.push({label: '开课学院: ', value: course.dept.name});
+                        this.courseInfo.push({label: '课程性质: ', value: course.nature});
+                        this.courseInfo.push({label: '课程归属: ', value: course.attr});
+                        this.courseInfo.push({label: '课程学分: ', value: course.credit});
+                        this.courseInfo.push({label: '课程容量: ', value: tc.capacity});
+                        this.courseInfo.push({label: '选课余量: ', value: tc.margin});
+                        this.courseInfo.push({
+                            label: '选课时间: ',
+                            value: util.formatDateTime(tc.startSelectTime) + ' - ' + util.formatDateTime(tc.endSelectTime)
+                        });
 
-                        for (let i = 0; i < this.tcList.length; i++) {
-                            this.tcList[i].marginAndCap = this.tcList[i].margin + '/'+this.tcList[i].capacity
-                            this.tcList[i].start = util.formatDateTime(this.tcList[i].startSelectTime)
-                            this.tcList[i].end = util.formatDateTime(this.tcList[i].endSelectTime)
+                        this.teacherInfo = [];
+                        this.teacherInfo.push({label: '教师工号: ', value: teacher.id});
+                        this.teacherInfo.push({label: '教师姓名: ', value: teacher.name});
+                        this.teacherInfo.push({label: '所在学院: ', value: teacher.dept.name});
+                        this.teacherInfo.push({label: '联系手机: ', value: teacher.phone});
+                        this.teacherInfo.push({label: '邮箱地址: ', value: teacher.email});
+
+                    } else {
+                        return this.$Message.error(data.msg)
+                    }
+                })
+            },
+            getStuOfTc() {
+                this.tableLoading = true;
+                TcApi.listTcStu(this.currentId).then(({data}) => {
+                    if (data.code === this.$code.SUCCESS) {
+                        this.studentList = util.safe(data, 'data.studentList', []);
+
+                        for (let i = 0; i < this.studentList.length; i++) {
+                            this.studentList[i].selectTime = util.formatDateTime(this.studentList[i].selectTime);
+
+                            this.studentList[i].deptName = this.studentList[i].dept.name;
+                            this.studentList[i].majorName = this.studentList[i].major.name;
+                            this.studentList[i].schoolYear = '20' + this.studentList[i].schoolYear + '级';
+                            this.studentList[i].class = this.studentList[i].class + '班';
                         }
 
                         this.total = util.safe(data, 'data.total', 0);
@@ -169,94 +306,53 @@
                     }
                 })
             },
-            doExport() {
-                this.$refs.table.exportCsv({
-                    filename: '选课信息'
-                })
+            getResourse() {
+
             },
-            doDeleteBatch() {
-                this.$Modal.confirm({
-                    nature: '删除选中的选课',
-                    content: '确定删除选中的选课，删除后不可恢复',
-                    onOk: () => {
-                        let ids = [];
-                        for (let i = 0; i < this.selection.length; i++) {
-                            ids.push(this.selection[i].id);
+            getAllComment() {
+
+            },
+            handleAddStuForTc() {
+                this.selectModel = true;
+                this.listAllStu();
+            },
+            modelOk() {
+                this.addStuOfTc(this.currentSelectId)
+            },
+            modelCancel() {
+                this.pageSize = 20;
+                this.page = 1;
+                this.searchText = '';
+                this.tableData = [];
+            },
+            listAllStu() {
+                let cond = {
+                    id: this.searchText,
+                    name: this.searchText,
+                    page: this.page,
+                    pageSize: this.pageSize,
+                };
+
+                StudentApi.list(cond).then(({data}) => {
+                    if (data.code === this.$code.SUCCESS) {
+                        this.tableData = util.safe(data, 'data.studentList', []);
+                        for (let i = 0; i < this.tableData.length; i++) {
+                            this.tableData[i].deptName = this.tableData[i].dept.name;
                         }
-                        this.delete(ids);
-                    }
-                })
-            },
-            selectionChange(selection) {
-                this.selection = selection
-            },
-            getSelectIds() {
-                let ids = [];
-                for (let i = 0; i < this.selection.length; i++) {
-                    ids.push(this.selection[i].id);
-                }
-                return ids;
-            },
-            delete(ids) {
-                TcApi.delete(ids).then(({data}) => {
-                    if (data.code === this.$code.SUCCESS) {
-                        this.$Message.success('删除成功')
-                        this.doSearch();
+                        this.total = util.safe(data, 'data.total', 0);
                     } else {
                         return this.$Message.error(data.msg)
                     }
                 })
+
             },
-            updateBatch(upData) {
-                TcApi.updateBatch(upData).then(({data}) => {
-                    if (data.code === this.$code.SUCCESS) {
-                        this.$Message.success('修改成功');
-                        this.capModel = false;
-                        this.selectTimeModel = false;
-                        this.doSearch();
-                    } else {
-                        return this.$Message.error(data.msg)
-                    }
-                })
-            },
-            changePage(page) {
-                this.selectCond.page = page;
-                this.doSearch();
-            },
-            changePageSize(size) {
-                this.selectCond.pageSize = size;
-                this.doSearch();
-            },
-            condSelectChange() {
-                this.doSearch();
-            },
-            tabsChange(name) {
-                this.selectCond.selectState = name;
-                this.doSearch();
-            },
-            setSelectTime() {
-                this.selectTimeModel = true;
-            },
-            setCap() {
-                this.capModel = true;
-            },
-            modelOk(which) {
-                if (which === 'cap') {
-                    this.updateBatch({ids: this.getSelectIds(), tc: {capacity: this.capacity}});
-                } else {
-                    this.updateBatch({ids: this.getSelectIds(), tc: {
-                        startSelectTime: this.selectTimeStr[0].getTime(),
-                        endSelectTime: this.selectTimeStr[1].getTime(),
-                    }});
-                }
-            },
-            setSelectState(state) {
-                this.updateBatch({ids: this.getSelectIds(), tc: {status: state}});
+            handleCurrentRowChange(currentRow, oldCurrentRow) {
+                this.currentSelectId = currentRow.id;
             }
         },
         mounted() {
-            this.initCondition();
-            this.doSearch();
+            this.currentId = this.$route.params.id;
+            this.getBasicInfo();
         }
     }
 </script>

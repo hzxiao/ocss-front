@@ -98,4 +98,17 @@ export default {
             data
         })
     },
+    listTcStu(id) {
+        return httpUtil.fetch({
+            url: this.url +'stu/list/' + id,
+            method: 'get'
+        })
+    },
+    updateStuForTc(data) {
+        return httpUtil.fetch({
+            url: this.url +'stu/update',
+            method: 'post',
+            data
+        })
+    }
 }

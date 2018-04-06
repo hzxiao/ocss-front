@@ -175,7 +175,7 @@
                                     props: {type: 'primary', size: 'small'}, style: {marginRight: '5px'},
                                     on: {
                                         click: () => {
-                                            this.$router.push({name: 'teach-course-detail-adm', params: {id: this.tcList[params.index].id}});
+                                            this.$router.push({name: 'teach-course-detail-adm', params: {id: this.tcList[params.index].id, tid: this.tcList[params.index].cid, cid: this.tcList[params.index].cid}});
                                         }
                                     }},
                                 '查看'
