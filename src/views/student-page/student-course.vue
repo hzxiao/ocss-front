@@ -52,13 +52,13 @@
                     key: 'deptName'
                 }, {
                     title: '上课时间',
-                    key: 'marginAndCap'
+                    key: 'startEndTime'
                 }, {
                     title: '起始结束周',
-                    key: 'start'
+                    key: 'startEndWeek'
                 }, {
                     title: '上课地点',
-                    key: 'end'
+                    key: 'addr'
                 },  {
                     title: '性质',
                     key: 'nature'
@@ -97,6 +97,18 @@
                 TcApi.listStuCourse(this.selectCond).then(({data}) => {
                     if (data.code === this.$code.SUCCESS) {
                         this.courses = util.safe(data, 'data.tcList', []);
+
+                    for (let i = 0; i < this.courses.length; i++) {
+                        this.courses[i].startEndWeek = this.courses[i].takeWeek.startWeek+'-'+this.courses[i].takeWeek.endWeek;
+                        let learnTime = '';
+                        if (this.courses[i].takeTime != null && this.courses[i].takeTime.dayOfWeek!=null&&this.courses[i].takeTime.sections!=null){
+                            for (let j = 0; j < this.courses[i].takeTime.dayOfWeek.length && j < this.courses[i].takeTime.sections.length ; j++){
+                                learnTime = learnTime + this.courses[i].takeTime.dayOfWeek[j] + ':'
+                                    + this.courses[i].takeTime.sections[j] + '、';
+                            }
+                        }
+                        this.courses[i].startEndTime = learnTime;
+                    }
                         this.tableLoading = false;
                         this.total = util.safe(data, 'data.total', 0);
                     } else {

@@ -39,7 +39,7 @@
 
             <div class="cond-item">
                 <p>班级：</p>
-                <Select v-model="selectCond.class" filterable clearable @on-change="condSelectChange('class')">
+                    <Select v-model="selectCond.class" filterable clearable @on-change="condSelectChange('class')">
                     <Option v-for="item in classList" :value="item.id" :key="item.id">
                         {{ item.name}}
                     </Option>
