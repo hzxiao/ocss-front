@@ -286,9 +286,6 @@
                         this.$Message.success('提交成功');
                         this.doSearch();
                     } else {
-                        if (data.err.indexOf('This Student has select the course')!=-1){
-                            data.msg = '该课程已选'
-                        }
                         return this.$Message.error(data.msg)
                     }
                 })

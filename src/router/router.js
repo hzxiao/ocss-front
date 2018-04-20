@@ -525,6 +525,23 @@ export const appRouter = [{
         }]
     },
     {
+        path: '/student-course-detail',
+            icon: 'android-sad',
+        title: '我的课程详情',
+        name: 'student-course-detail',
+        component: Main,
+        meta: {
+        roles: [5]
+    },
+        children: [{
+            path: 'StudentCourseDetail',
+            title: '我的课程详情',
+            name: 'student-course-detail-stu',
+            component: () =>
+            import ('@/views/student-page/student-course-detail.vue')
+        }]
+    },
+    {
         path: '/select-courses',
         icon: 'android-sad',
         title: '选课中心',

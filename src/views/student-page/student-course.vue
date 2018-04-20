@@ -78,7 +78,7 @@
                                     style: {marginRight: '5px'},
                                     on: {
                                         click: () => {
-                                            this.$router.push({name: 'edit-course', params: {id: this.teacherList[params.index].id}});
+                                            this.$router.push({name: 'student-course-detail-stu', params: {id: this.courses[params.index].id}});
                                         }
                                     }},
                                 '查看'
