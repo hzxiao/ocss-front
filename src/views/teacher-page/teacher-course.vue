@@ -1,5 +1,5 @@
 <style lang="less">
-    @import './student-course.less';
+    @import './teacher-course.less';
 </style>
 
 <template>
@@ -27,6 +27,7 @@
 <script>
     import {TcApi} from '../../api'
     import util from '../../libs/util';
+    import Cookies from 'js-cookie';
     export default {
         data() {
             return {
@@ -77,7 +78,7 @@
                                     style: {marginRight: '5px'},
                                     on: {
                                         click: () => {
-                                            this.$router.push({name: 'student-course-detail-stu', params: {id: this.courses[params.index].id}});
+                                            this.$router.push({name: 'teacher-course-detail-tea', params: {id: this.courses[params.index].id}});
                                         }
                                     }},
                                 '查看'
@@ -92,8 +93,9 @@
             doSearch() {
                 this.tableLoading = true;
                 this.selectCond.name = this.searchText;
+                this.selectCond.tid = Cookies.get('user');
 
-                TcApi.listStuCourse(this.selectCond).then(({data}) => {
+                TcApi.list(this.selectCond).then(({data}) => {
                     if (data.code === this.$code.SUCCESS) {
                         this.courses = util.safe(data, 'data.tcList', []);
 

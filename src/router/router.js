@@ -482,12 +482,37 @@ export const appRouter = [{
         meta: {
             roles: [2]
         },
-        children: [{
-            path: 'listTeacherCourse',
-            title: '我的课程',
-            name: 'list-teacher-course',
+        children: [
+            {
+                path: 'listTeacherCourse',
+                title: '我的课程',
+                name: 'list-teacher-course-tea',
+                component: () =>
+                import ('@/views/teacher-page/teacher-course.vue')
+            }
+            ,{
+            path: 'listCourse',
+            title: '课程列表',
+            name: 'list-course-tea',
             component: () =>
-                import ('@/views/abstract.vue')
+                import ('@/views/teacher-page/list-course.vue')
+            }]
+    },
+    {
+        path: '/teacher-courses',
+            icon: 'android-sad',
+        title: '我的课程详情',
+        name: 'teacher-course',
+        component: Main,
+        meta: {
+        roles: [5]
+    },
+        children: [{
+            path: 'TeacherCourseDetail',
+            title: '我的课程详情',
+            name: 'teacher-course-detail-tea',
+            component: () =>
+            import ('@/views/teacher-page/teacher-course-detail.vue')
         }]
     },
     {
