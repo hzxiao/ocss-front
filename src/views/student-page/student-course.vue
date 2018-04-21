@@ -27,6 +27,7 @@
 <script>
     import {TcApi} from '../../api'
     import util from '../../libs/util';
+    import Cookies from 'js-cookie';
     export default {
         data() {
             return {
@@ -92,11 +93,11 @@
             doSearch() {
                 this.tableLoading = true;
                 this.selectCond.name = this.searchText;
-
+                let sid = Cookies.get('user');
                 TcApi.listStuCourse(this.selectCond).then(({data}) => {
                     if (data.code === this.$code.SUCCESS) {
                         this.courses = util.safe(data, 'data.tcList', []);
-
+                    let tcsids = [];
                     for (let i = 0; i < this.courses.length; i++) {
                         this.courses[i].startEndWeek = this.courses[i].takeWeek.startWeek+'-'+this.courses[i].takeWeek.endWeek;
                         let learnTime = '';
@@ -107,7 +108,12 @@
                             }
                         }
                         this.courses[i].startEndTime = learnTime;
+
                     }
+                        if (tcsids!=null&&tcsids.length >1){
+                            this.selectedStuOfTc(tcsids);
+                            this.doSearch();
+                        }
                         this.tableLoading = false;
                         this.total = util.safe(data, 'data.total', 0);
                     } else {
@@ -116,6 +122,8 @@
                     }
                 })
             },
+
+
             changePage(page) {
                 this.selectCond.page = page;
                 this.doSearch();

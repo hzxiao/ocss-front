@@ -129,6 +129,15 @@
                 }, {
                     title: '选课时间',
                     key: 'selectTime'
+                },{
+                    title: '考试成绩',
+                    key: 'examGrade'
+                },{
+                    title: '平时成绩',
+                    key: 'ordinaryGrade'
+                },{
+                    title: '成绩',
+                    key: 'grade'
                 }],
                 studentList: [],
                 deptList: [],

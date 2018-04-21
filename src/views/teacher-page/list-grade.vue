@@ -1,5 +1,5 @@
 <style lang="less">
-    @import './teacher-course.less';
+    @import './list-grade.less';
 </style>
 
 <template>
@@ -51,20 +51,23 @@
                     title: '开课学院',
                     key: 'deptName'
                 }, {
-                    title: '上课时间',
-                    key: 'startEndTime'
-                }, {
-                    title: '起始结束周',
-                    key: 'startEndWeek'
-                }, {
-                    title: '上课地点',
-                    key: 'addr'
-                },  {
                     title: '性质',
                     key: 'nature'
                 }, {
                     title: '归属',
                     key: 'attr'
+                }, {
+                    title: '上课人数',
+                    key: 'studentNum'
+                }, {
+                    title: '平均成绩',
+                    key: 'grade'
+                }, {
+                    title: '平时成绩',
+                    key: 'ordinaryGrade'
+                }, {
+                    title: '考试成绩',
+                    key: 'examGrade'
                 }, {
                     title: '状态',
                     key: 'tcStatus'
@@ -101,37 +104,27 @@
                 TcApi.list(this.selectCond).then(({data}) => {
                     if (data.code === this.$code.SUCCESS) {
                         this.courses = util.safe(data, 'data.tcList', []);
-                    let tcsids = [];
-                    for (let i = 0; i < this.courses.length; i++) {
-                        this.courses[i].startEndWeek = this.courses[i].takeWeek.startWeek+'-'+this.courses[i].takeWeek.endWeek;
-                        let learnTime = '';
-                        if (this.courses[i].takeTime != null && this.courses[i].takeTime.dayOfWeek!=null&&this.courses[i].takeTime.sections!=null){
-                            for (let j = 0; j < this.courses[i].takeTime.dayOfWeek.length && j < this.courses[i].takeTime.sections.length ; j++){
-                                learnTime = learnTime + this.courses[i].takeTime.dayOfWeek[j] + ':'
-                                    + this.courses[i].takeTime.sections[j] + '、';
+                        let tcsids = [];
+                        //算分数
+                        for (let i = 0; i < this.courses.length; i++) {
+                            this.courses[i].startEndWeek = this.courses[i].takeWeek.startWeek+'-'+this.courses[i].takeWeek.endWeek;
+                            this.courses[i].studentNum = this.courses[i].stuInfo.length;
+                            let learnTime = '';
+                            if (this.courses[i].takeTime != null && this.courses[i].takeTime.dayOfWeek!=null&&this.courses[i].takeTime.sections!=null){
+                                for (let j = 0; j < this.courses[i].takeTime.dayOfWeek.length && j < this.courses[i].takeTime.sections.length ; j++){
+                                    learnTime = learnTime + this.courses[i].takeTime.dayOfWeek[j] + ':'
+                                        + this.courses[i].takeTime.sections[j] + '、';
+                                }
                             }
-                        }
-                        this.courses[i].startEndTime = learnTime;
+                            this.courses[i].startEndTime = learnTime;
 
-                    }
+                        }
 
 
                         this.tableLoading = false;
                         this.total = util.safe(data, 'data.total', 0);
                     } else {
                         this.tableLoading = false;
-                        return this.$Message.error(data.msg)
-                    }
-                })
-            },
-            updateBatch(upData) {
-                TcApi.updateBatch(upData).then(({data}) => {
-                    if (data.code === this.$code.SUCCESS) {
-                        this.$Message.success('修改成功');
-                        this.capModel = false;
-                        this.selectTimeModel = false;
-                        this.doSearch();
-                    } else {
                         return this.$Message.error(data.msg)
                     }
                 })
@@ -143,6 +136,29 @@
             changePageSize(size) {
                 this.selectCond.pageSize = size;
                 this.doSearch();
+            },
+            getStuOfTc() {
+                this.tableLoading = true;
+                TcApi.listTcStu(this.currentId).then(({data}) => {
+                    if (data.code === this.$code.SUCCESS) {
+                        this.studentList = util.safe(data, 'data.studentList', []);
+
+                        for (let i = 0; i < this.studentList.length; i++) {
+                            this.studentList[i].selectTime = util.formatDateTime(this.studentList[i].selectTime);
+
+                            this.studentList[i].deptName = this.studentList[i].dept.name;
+                            this.studentList[i].majorName = this.studentList[i].major.name;
+                            this.studentList[i].schoolYear = '20' + this.studentList[i].schoolYear + '级';
+                            this.studentList[i].class = this.studentList[i].class + '班';
+                        }
+
+                        this.total = util.safe(data, 'data.total', 0);
+                        this.tableLoading = false;
+                    } else {
+                        this.tableLoading = false;
+                        return this.$Message.error(data.msg)
+                    }
+                })
             },
         },
         mounted() {

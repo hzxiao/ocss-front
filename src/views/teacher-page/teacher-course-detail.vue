@@ -70,6 +70,36 @@
 
         </Modal>
 
+        <Modal
+                v-model="updateGradeModel"
+                title="更新成绩"
+                loading
+                @on-ok="updateGradeModelOk()">
+            <div class="es">
+                <Form ref="studentGrade" :model="studentGrade"  :label-width="80">
+                    <div class="lrbox">
+                        <div class="left-side">
+                            <FormItem label="" prop="examGrade">
+                                <Input v-model="studentGrade.examGrade"  placeholder="考试成绩"></Input>
+                            </FormItem>
+                        </div>
+                        <div class="left-side">
+                            <FormItem label="" prop="ordinaryGrade">
+                                <Input v-model="studentGrade.ordinaryGrade"  placeholder="平时成绩"></Input>
+                            </FormItem>
+                        </div>
+                        <div class="left-side">
+                            <FormItem label="" prop="grade">
+                                <Input v-model="studentGrade.grade"  placeholder="综合成绩"></Input>
+                            </FormItem>
+                        </div>
+                    </div>
+                </Form>
+            </div>
+        </Modal>
+
+
+
     </div>
 
 </template>
@@ -119,7 +149,41 @@
                 }, {
                     title: '选课时间',
                     key: 'selectTime'
+                },{
+                    title: '考试成绩',
+                    key: 'examGrade'
+                },{
+                    title: '平时成绩',
+                    key: 'ordinaryGrade'
+                },{
+                    title: '成绩',
+                    key: 'grade'
+                },{
+                    title: '操作',
+                    key: 'action',
+                    width: 150,
+                    align: 'center',
+                    render: (h, params) => {
+                        return h('div', [
+                            h(
+                                'Button', {
+                                    props: {type: 'primary', size: 'small'},
+                                    style: {marginRight: '5px'},
+                                    on: {
+                                        click: () => {
+                                            this.studentGrade = this.studentList[params.index];
+                                            this.updateStudentGrade();
+//                                            this.$router.push({name: 'teacher-course-detail-tea', params: {id: this.courses[params.index].id}});
+                                        }
+                                    }},
+                                '更新成绩'
+                            )
+                        ])
+                    }
                 }],
+
+                studentGrade:{},
+
                 studentList: [],
                 deptList: [],
                 natureList,
@@ -131,7 +195,7 @@
                     id: 2,
                     name: '不可选'
                 }],
-                selectTimeModel: false,
+                updateGradeModel: false,
                 selectTimeStr: '',
                 capModel: false,
                 capacity: 0,
@@ -291,7 +355,29 @@
             },
             handleCurrentRowChange(currentRow, oldCurrentRow) {
                 this.currentSelectId = currentRow.id;
-            }
+            },
+            // 更新成绩
+            updateStudentGrade() {
+                this.updateGradeModel = true;
+            },
+            updateGradeModelOk() {
+                TcApi.updateGradeForTc({tc:
+                    {id:this.currentId,
+                        StuInfo: [{sid:this.studentGrade.id,
+                            examGrade:this.studentGrade.examGrade,
+                            ordinaryGrade:this.studentGrade.ordinaryGrade,
+                            grade:this.studentGrade.grade}]
+                    }
+                }).then(({data}) => {
+                    if (data.code === this.$code.SUCCESS) {
+                        this.$Message.success('修改成功');
+                        this.updateGradeModel = false;
+                        this.doSearch();
+                    } else {
+                        return this.$Message.error(data.msg)
+                    }
+                });
+            },
         },
         mounted() {
             this.currentId = this.$route.params.id;

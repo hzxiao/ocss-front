@@ -110,5 +110,12 @@ export default {
             method: 'post',
             data
         })
-    }
+    },
+    updateGradeForTc(data) {
+        return httpUtil.fetch({
+            url: this.url+'updateGrade',
+            method: 'put',
+            data
+        })
+    },
 }

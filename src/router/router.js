@@ -529,7 +529,7 @@ export const appRouter = [{
             title: '成绩管理',
             name: 'setting-grade',
             component: () =>
-                import ('@/views/abstract.vue')
+                import ('@/views/teacher-page/list-grade.vue')
         }]
     },
     {
