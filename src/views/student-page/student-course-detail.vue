@@ -40,14 +40,52 @@
             </TabPane>
             <TabPane label="选课学生" name="1">
 
-
                 <Table ref="table" :loading="tableLoading" :data="studentList" :columns="tableColumns"
                        @on-selection-change="selectionChange" stripe>
                 </Table>
 
             </TabPane>
             <TabPane label="课程留言" name="2">
-
+                <div id="comment">
+                    <div class="comment-content-con">
+                        <transition name="view-comment">
+                            <div v-if="!showChildCommentList" class="comment-list-con">
+                                <div class="search">
+                                    <!--<Input v-model="searchText" icon="search" placeholder="输入课程名称或号码" style="width: 200px"/>-->
+                                    <Button type="primary" shape="circle"  @click="addComment()">发表评论</Button>
+                                </div>
+                                <Table ref="commentList" :columns="commentColumns" :data="commentList"
+                                       :no-data-text="noDataText"></Table>
+                            </div>
+                        </transition>
+                        <transition name="back-comment-list">
+                            <div v-if="showChildCommentList" class="comment-view-content-con">
+                                <div class="search">
+                                    <!--<Input v-model="searchText" icon="search" placeholder="输入课程名称或号码" style="width: 200px"/>-->
+                                    <Button type="primary" shape="circle"  @click="addChildComment()">回复评论</Button>
+                                </div>
+                                <div class="comment-content-top-bar">
+                                    <span class="cmt-back-btn-con"><Button type="text" @click="backCommentList"><Icon
+                                            type="chevron-left"></Icon>&nbsp;&nbsp;返回</Button></span>
+                                    <div class="comment-content">{{ currentComment.name}}</div>
+                                    <div class="comment-content">{{ currentComment.create}}</div>
+                                    <div class="comment-content">{{ currentComment.content}}</div>
+                                </div>
+                                <div  class="comment-list-con">
+                                    <Table ref="commentChildrenList" :columns="commentChildrenColumns" :data="commentChildrenList"
+                                           :no-data-text="noDataText"></Table>
+                                </div>
+                            </div>
+                        </transition>
+                    </div>
+                    <Page :total="total" :current="selectCondComment.page"
+                          size="small"
+                          :page-size="selectCondComment.pageSize"
+                          placement="top"
+                          @on-change="changeCommentPage"
+                          @on-page-size-change="changeCommentPageSize"
+                          show-elevator show-total show-sizer></Page>
+                </div>
             </TabPane>
             <TabPane label="课件" name="3">
 
@@ -80,12 +118,47 @@
 
         </Modal>
 
+        <!--评论-->
+        <Modal
+                v-model="addCommentModal"
+                title="发表评论"
+                loading
+                @on-ok="addCommentModalOk()">
+            <div class="es">
+                <Form ref="newComment" :model="newComment"  :label-width="80">
+                    <div class="lrbox">
+                        <div class="left-side">
+                            <FormItem label="评论内容" prop="content">
+                                <Input type="textarea" v-model="newComment.content" :autosize="{minRows: 3,maxRows: 6}"  placeholder="谈谈你对本课程的看看" />
+                            </FormItem>
+                        </div>
+                    </div>
+                </Form>
+            </div>
+        </Modal>
+        <Modal
+                v-model="addChildCommentModal"
+                title="回复评论"
+                loading
+                @on-ok="addChildCommentModalOk()">
+            <div class="es">
+                <Form ref="newChildComment" :model="newChildComment"  :label-width="80">
+                    <div class="lrbox">
+                        <div class="left-side">
+                            <FormItem label="评论内容" prop="content">
+                                <Input type="textarea" v-model="newChildComment.content" :autosize="{minRows: 3,maxRows: 6}"  placeholder="谈谈你对本课程的看看" />
+                            </FormItem>
+                        </div>
+                    </div>
+                </Form>
+            </div>
+        </Modal>
     </div>
 
 </template>
 
 <script>
-    import {StudentApi, TcApi} from '../../api'
+    import {CommentApi, StudentApi, TcApi} from '../../api'
     import util from '../../libs/util';
     import {attrList, natureList} from '../../libs/data';
     import Cookies from 'js-cookie';
@@ -136,7 +209,7 @@
                     title: '平时成绩',
                     key: 'ordinaryGrade'
                 },{
-                    title: '成绩',
+                    title: '综合成绩',
                     key: 'grade'
                 }],
                 studentList: [],
@@ -178,6 +251,110 @@
                         key: 'deptName'
                     }
                 ],
+
+                //评论
+                commentList: [],
+                newComment:{},
+                newChildComment:{},
+                selectCondComment: {
+                    tcid: '',
+                    status: 1,
+                    page: 1,
+                    pageSize: 20,
+                    sort: '-create'
+                },
+                addCommentModal: false,
+                addChildCommentModal: false,
+                showChildCommentList: false,
+                currentComment: {},
+                commentChildrenList: [],
+                commentColumns:[
+                    {
+                        title: '评论者',
+                        key: 'name'
+                    },
+                    {
+                        title: '评论角色',
+                        key: 'role'
+                    },
+                    {
+                        title: '评论内容',
+                        key: 'content'
+                    },
+                    {
+                        title: '评论时间',
+                        key: 'create'
+                    },{
+                        title: '操作',
+                        key: 'action',
+                        width: 200,
+                        align: 'center',
+                        render: (h, params) => {
+                            return h('div', [
+                                h(
+                                    'Button', {
+                                        props: {type: 'error', size: 'small'},
+                                        style: {marginRight: '5px'},
+                                        on: {
+                                            click: () => {
+                                                this.deleteComment([this.commentList[params.index].id]);
+                                            }
+                                        }},
+                                    '删除评论'
+                                ),
+                                h(
+                                    'Button', {
+                                        props: {type: 'primary', size: 'small'},
+                                        style: {marginRight: '5px'},
+                                        on: {
+                                            click: () => {
+                                                this.currentComment = this.commentList[params.index];
+                                                this.showCommentDetail();
+                                            }
+                                        }},
+                                    '评论详情'
+                                )
+                            ])
+                        }
+                    }
+                ],
+                commentChildrenColumns:[
+                    {
+                        title: '评论者',
+                        key: 'name'
+                    },
+                    {
+                        title: '评论角色',
+                        key: 'role'
+                    },
+                    {
+                        title: '评论内容',
+                        key: 'content'
+                    },
+                    {
+                        title: '评论时间',
+                        key: 'create'
+                    },{
+                        title: '操作',
+                        key: 'action',
+                        width: 100,
+                        align: 'center',
+                        render: (h, params) => {
+                            return h('div', [
+                                h(
+                                    'Button', {
+                                        props: {type: 'error', size: 'small'},
+                                        style: {marginRight: '5px'},
+                                        on: {
+                                            click: () => {
+                                                this.deleteChildCommentren([this.currentComment.id],[this.currentComment.children[params.index].id]);
+                                            }
+                                        }},
+                                    '删除评论'
+                                )
+                            ])
+                        }
+                    }]
             }
         },
         methods: {
@@ -190,6 +367,7 @@
                         this.getStuOfTc();
                         break;
                     case '2':
+                        this.getAllComment();
                         break;
                     case '3':
                         break;
@@ -286,9 +464,7 @@
             getResourse() {
 
             },
-            getAllComment() {
 
-            },
             handleAddStuForTc() {
                 this.selectModel = true;
                 this.listAllStu();
@@ -325,7 +501,119 @@
             },
             handleCurrentRowChange(currentRow, oldCurrentRow) {
                 this.currentSelectId = currentRow.id;
+            },
+            //评论
+            getAllComment() {
+                CommentApi.list(this.selectCondComment).then(({data}) => {
+                    if (data.code === this.$code.SUCCESS) {
+                        this.commentList = util.safe(data, 'data.commentList', []);
+                        for (let i = 0; i < this.commentList.length; i++){
+                            this.commentList[i].create = util.formatDateTime(this.commentList[i].create);
+                            if(this.commentList.length != null){
+                                for(let j = 0; j < this.commentList[i].children.length; j++){
+                                    this.commentList[i].children[j].create = util.formatDateTime(this.commentList[i].children[j].create);
+                                }
+                            }
+                            this.commentList.childTotal = this.commentList.length;
+                        }
+                        this.total = util.safe(data, 'data.total', 0);
+                    } else {
+                        return this.$Message.error(data.msg)
+                    }
+                })
+            },
+            getCommentInput(){
+
+            },
+            addComment(){
+                this.newComment.tcid = this.currentId;
+                this.addCommentModal = true;
+            },
+            addCommentModalOk(){
+                if (this.newComment.content === null || this.newComment.content.length === 0){
+                    this.$Message.error("评论内容不能为空");
+                    this.addCommentModal = false;
+                    return;
+                }
+                CommentApi.addComment(this.newComment).then(({data}) => {
+                    if (data.code === this.$code.SUCCESS) {
+                        this.$Message.success('发表成功');
+                        this.addCommentModal = false;
+                        this.newComment.content = '';
+                        this.getAllComment();
+                    } else {
+                        return this.$Message.error(data.msg)
+                    }
+                })
+            },
+
+            deleteComment(ids) {
+                CommentApi.delete(ids).then(({data}) => {
+                    if (data.code === this.$code.SUCCESS) {
+                        this.$Message.success('删除成功');
+                        this.getAllComment();
+                    } else {
+                        return this.$Message.error(data.msg)
+                    }
+                })
+            },
+
+            changeCommentPage(page){
+                this.selectCondComment.page = page;
+                this.getAllComment();
+            },
+            changeCommentPageSize(size){
+                this.selectCondComment.pageSize = size;
+                this.getAllComment();
+            },
+            showCommentDetail(){
+                this.showChildCommentList = true;
+                this.commentChildrenList = this.currentComment.children;
+            },
+            backCommentList() {
+                this.showChildCommentList = false;
+            },
+            deleteChildCommentren(ids,childId){
+                CommentApi.deleteChildComment(ids,childId).then(({data}) => {
+                    if (data.code === this.$code.SUCCESS) {
+                        this.$Message.success('删除成功');
+                        this.getAllComment();
+                    } else {
+                        return this.$Message.error(data.msg)
+                    }
+                })
+            },
+            addChildComment(){
+                this.addChildCommentModal = true;
+            },
+            addChildCommentModalOk(){
+                if (this.newChildComment.content === null || this.newChildComment.content.length === 0){
+                    this.$Message.error("回复评论内容不能为空");
+                    this.addChildCommentModal = false;
+                    return;
+                }
+                CommentApi.addChildComment(this.currentComment.id,this.newChildComment).then(({data}) => {
+                    if (data.code === this.$code.SUCCESS) {
+                        this.$Message.success('发表成功');
+                        this.addChildCommentModal = false;
+                        this.newChildComment.content = '';
+                        this.getNewChildComment();
+                    } else {
+                        return this.$Message.error(data.msg)
+                    }
+                })
+            },
+            getNewChildComment(){
+                this.getAllComment();
+                for (let i = 0; i < this.commentList.length; i++){
+                    if (this.commentList[i].id === this.currentComment.id){
+                        this.currentComment = this.commentList[i];
+                        break;
+                    }
+                }
+                this.commentChildrenList = this.currentComment.children;
             }
+
         },
         mounted() {
             this.currentId = this.$route.params.id;

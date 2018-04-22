@@ -30,3 +30,8 @@ export {
 export {
     default as NoticeApi
 } from './notice.api'
+
+export {
+    default as CommentApi
+}
+    from './comment.api'
