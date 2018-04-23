@@ -55,11 +55,23 @@
                                     <Button type="primary" shape="circle"  @click="addComment()">发表评论</Button>
                                 </div>
                                 <Table ref="commentList" :columns="commentColumns" :data="commentList"
-                                       :no-data-text="noDataText"></Table>
+                                       :no-data-text="noDataText">
+                                    <div slot="footer" style="padding-left:5px">
+                                    <Page :total="total" :current="selectCondComment.page"
+                                          size="small"
+                                          :page-size="selectCondComment.pageSize"
+                                          placement="top"
+                                          @on-change="changeCommentPage"
+                                          @on-page-size-change="changeCommentPageSize"
+                                          show-elevator show-total show-sizer></Page>
+                                    </div>
+                                </Table>
                             </div>
+
                         </transition>
                         <transition name="back-comment-list">
                             <div v-if="showChildCommentList" class="comment-view-content-con">
+
                                 <div class="search">
                                     <!--<Input v-model="searchText" icon="search" placeholder="输入课程名称或号码" style="width: 200px"/>-->
                                     <Button type="primary" shape="circle"  @click="addChildComment()">回复评论</Button>
@@ -67,9 +79,19 @@
                                 <div class="comment-content-top-bar">
                                     <span class="cmt-back-btn-con"><Button type="text" @click="backCommentList"><Icon
                                             type="chevron-left"></Icon>&nbsp;&nbsp;返回</Button></span>
-                                    <div class="comment-content">{{ currentComment.name}}</div>
-                                    <div class="comment-content">{{ currentComment.create}}</div>
-                                    <div class="comment-content">{{ currentComment.content}}</div>
+                                </div>
+                                <div class="post-hover">
+                                    <p class="auther">
+                                        <a target="_blank" class="blue b">{{ currentComment.name}}</a>
+                                    </p>
+                                    <div class="post-info dib-wrap cf"  data-t="topic">
+                                        <span class="mr20">{{ currentComment.create}}</span>
+
+                                        <a href="javascript:;" class="reply-btn info-tab mr20">
+                                            <span>{{currentComment.childTotal}}条回复</span>
+                                        </a>
+                                    </div>
+                                    <p class="post-body">{{ currentComment.content}}</p>
                                 </div>
                                 <div  class="comment-list-con">
                                     <Table ref="commentChildrenList" :columns="commentChildrenColumns" :data="commentChildrenList"
@@ -78,13 +100,7 @@
                             </div>
                         </transition>
                     </div>
-                    <Page :total="total" :current="selectCondComment.page"
-                          size="small"
-                          :page-size="selectCondComment.pageSize"
-                          placement="top"
-                          @on-change="changeCommentPage"
-                          @on-page-size-change="changeCommentPageSize"
-                          show-elevator show-total show-sizer></Page>
+
                 </div>
             </TabPane>
             <TabPane label="课件" name="3">
@@ -282,6 +298,10 @@
                         key: 'content'
                     },
                     {
+                        title: '回复数目',
+                        key: 'childTotal'
+                    },
+                    {
                         title: '评论时间',
                         key: 'create'
                     },{
@@ -320,19 +340,19 @@
                 ],
                 commentChildrenColumns:[
                     {
-                        title: '评论者',
+                        title: '回复者',
                         key: 'name'
                     },
                     {
-                        title: '评论角色',
+                        title: '回复角色',
                         key: 'role'
                     },
                     {
-                        title: '评论内容',
+                        title: '回复内容',
                         key: 'content'
                     },
                     {
-                        title: '评论时间',
+                        title: '回复时间',
                         key: 'create'
                     },{
                         title: '操作',
@@ -350,7 +370,7 @@
                                                 this.deleteChildCommentren([this.currentComment.id],[this.currentComment.children[params.index].id]);
                                             }
                                         }},
-                                    '删除评论'
+                                    '删除回复'
                                 )
                             ])
                         }
@@ -504,27 +524,37 @@
             },
             //评论
             getAllComment() {
+                this.selectCondComment.tcid = this.currentId;
                 CommentApi.list(this.selectCondComment).then(({data}) => {
                     if (data.code === this.$code.SUCCESS) {
                         this.commentList = util.safe(data, 'data.commentList', []);
                         for (let i = 0; i < this.commentList.length; i++){
                             this.commentList[i].create = util.formatDateTime(this.commentList[i].create);
-                            if(this.commentList.length != null){
+                            if(this.commentList[i].children != null){
                                 for(let j = 0; j < this.commentList[i].children.length; j++){
                                     this.commentList[i].children[j].create = util.formatDateTime(this.commentList[i].children[j].create);
                                 }
                             }
-                            this.commentList.childTotal = this.commentList.length;
                         }
                         this.total = util.safe(data, 'data.total', 0);
+                        if (this.showChildCommentList){
+                            console.log(this.showChildCommentList);
+                            for (let i = 0; i < this.commentList.length; i++){
+                                if (this.commentList[i].id === this.currentComment.id){
+                                    this.currentComment = this.commentList[i];
+                                    break;
+                                }
+                            }
+                            this.commentChildrenList = this.currentComment.children;
+                            this.total = this.commentChildrenList.childTotal;
+                        }
+
                     } else {
                         return this.$Message.error(data.msg)
                     }
                 })
             },
-            getCommentInput(){
 
-            },
             addComment(){
                 this.newComment.tcid = this.currentId;
                 this.addCommentModal = true;
@@ -572,6 +602,7 @@
             },
             backCommentList() {
                 this.showChildCommentList = false;
+                getAllComment();
             },
             deleteChildCommentren(ids,childId){
                 CommentApi.deleteChildComment(ids,childId).then(({data}) => {
@@ -605,15 +636,7 @@
             },
             getNewChildComment(){
                 this.getAllComment();
-                for (let i = 0; i < this.commentList.length; i++){
-                    if (this.commentList[i].id === this.currentComment.id){
-                        this.currentComment = this.commentList[i];
-                        break;
-                    }
-                }
-                this.commentChildrenList = this.currentComment.children;
-            }
-
+            },
         },
         mounted() {
             this.currentId = this.$route.params.id;
