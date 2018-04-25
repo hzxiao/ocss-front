@@ -35,3 +35,8 @@ export {
     default as CommentApi
 }
     from './comment.api'
+
+export {
+    default as ResourceApi
+}
+    from './resource.api'

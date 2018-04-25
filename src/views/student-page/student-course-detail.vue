@@ -103,7 +103,23 @@
 
                 </div>
             </TabPane>
+
             <TabPane label="课件" name="3">
+                <div id="resource">
+                    <Table ref="resourceList" :columns="resourceColumns" :data="resourceList"
+                           :no-data-text="noDataText">
+                        <div slot="footer" style="padding-left:5px">
+                            <Page :total="total" :current="selectCondResource.page"
+                                  size="small"
+                                  :page-size="selectCondResource.pageSize"
+                                  placement="top"
+                                  @on-change="changeResourcePage"
+                                  @on-page-size-change="changeResourcePageSize"
+                                  show-elevator show-total show-sizer></Page>
+                        </div>
+                    </Table>
+                </div>
+            </TabPane>
 
             </TabPane>
         </Tabs>
@@ -174,7 +190,7 @@
 </template>
 
 <script>
-    import {CommentApi, StudentApi, TcApi} from '../../api'
+    import {CommentApi, StudentApi, TcApi, ResourceApi} from '../../api'
     import util from '../../libs/util';
     import {attrList, natureList} from '../../libs/data';
     import Cookies from 'js-cookie';
@@ -374,7 +390,61 @@
                                 )
                             ])
                         }
-                    }]
+                    }],
+
+                // 课件
+                selectCondResource: {
+                    tcid: '',
+                    tid: '',
+                    status: 1,
+                    page: 1,
+                    pageSize: 20,
+                    sort: '-create'
+                },
+                resourceList: [],
+                resourceColumns: [
+                    {
+                        title: '上传老师',
+                        key: 'teacherName'
+                    },
+                    {
+                        title: '课程名称',
+                        key: 'courseName'
+                    },
+                    {
+                        title: '课件描述',
+                        key: 'desc'
+                    },
+                    {
+                        title: '课件名称',
+                        key: 'fileName'
+                    },
+                    {
+                        title: '上传时间',
+                        key: 'create'
+                    },{
+                        title: '操作',
+                        key: 'action',
+                        width: 200,
+                        align: 'center',
+                        render: (h, params) => {
+                            return h('div', [
+                                h(
+                                    'Button', {
+                                        props: {type: 'primary', size: 'small'},
+                                        style: {marginRight: '5px'},
+                                        on: {
+                                            click: () => {
+                                                this.downloadResource(this.resourceList[params.index].file.id);
+                                            }
+                                        }},
+                                    '下载课件'
+                                )
+
+                            ])
+                        }
+                    }],
+
             }
         },
         methods: {
@@ -390,6 +460,7 @@
                         this.getAllComment();
                         break;
                     case '3':
+                        this.getAllResources();
                         break;
                 }
             },
@@ -637,6 +708,36 @@
             getNewChildComment(){
                 this.getAllComment();
             },
+
+
+            //课件
+            downloadResource(id){
+                window.open('http://111.230.242.177:8999/files/' + id + '?dl=1');
+            },
+            changeResourcePage(page){
+                this.selectCondResource.page = page;
+                this.getAllResources();
+            },
+            changeResourcePageSize(size){
+                this.selectCondResource.pageSize = size;
+                this.getAllResources();
+            },
+            getAllResources(){
+                this.selectCondResource.tcid = this.currentId;
+                ResourceApi.list(this.selectCondResource).then(({data}) => {
+                    if (data.code === this.$code.SUCCESS) {
+                        this.resourceList = util.safe(data, 'data.resourceList', []);
+                        for (let i = 0; i < this.resourceList.length; i++){
+                            this.resourceList[i].create = util.formatDateTime(this.resourceList[i].create);
+                            this.resourceList[i].fileName = this.resourceList[i].file.name;
+                        }
+                        this.total = util.safe(data, 'data.total', 0);
+                    } else {
+                        return this.$Message.error(data.msg)
+                    }
+                })
+            },
+
         },
         mounted() {
             this.currentId = this.$route.params.id;

@@ -107,3 +107,40 @@ i.iconfont {
 .iconfont {
   font-size: 16px;
 }
+
+// 课件上传
+.com-box .resource-desc{
+  margin: auto;
+  position: relative;
+  text-align: center;
+  width: 70%;
+  height: 70%;
+}
+
+.box {
+  position: relative;
+}
+input {
+  position: absolute;
+  left: -9999px;
+}
+/* 使label充满整个box*/
+label {
+  position: absolute;
+  top: 0;left: 0;right: 0;bottom: 0;
+  z-index: 10; /* 这个z-index之后说到*/
+}
+
+.mo-upload {
+  display: inline-block;
+  position: relative;
+  margin-bottom: 0;
+  input[type="file"] {
+    display: none;
+  }
+  .mo-upload--label {
+    display: inline-block;
+    position: relative;
+  }
+}
+

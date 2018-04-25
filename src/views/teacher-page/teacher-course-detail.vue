@@ -99,8 +99,25 @@
             </TabPane>
 
             </TabPane>
-            <TabPane label="课件" name="3">
 
+            <TabPane label="课件" name="3">
+                <div id="resource">
+                    <div class="search">
+                        <Button type="primary" shape="circle"  @click="addCourseResource()">上传课件</Button>
+                    </div>
+                    <Table ref="resourceList" :columns="resourceColumns" :data="resourceList"
+                           :no-data-text="noDataText">
+                        <div slot="footer" style="padding-left:5px">
+                            <Page :total="total" :current="selectCondResource.page"
+                                  size="small"
+                                  :page-size="selectCondResource.pageSize"
+                                  placement="top"
+                                  @on-change="changeResourcePage"
+                                  @on-page-size-change="changeResourcePageSize"
+                                  show-elevator show-total show-sizer></Page>
+                        </div>
+                    </Table>
+                </div>
             </TabPane>
         </Tabs>
 
@@ -195,13 +212,56 @@
             </div>
         </Modal>
 
+        <!--上传课件-->
+        <Modal
+                v-model="addCourseResourceModal"
+                title="上传课件"
+                loading
+                @on-ok="addCourseResourceModalOk()">
+            <div class="com-box">
+
+                <div style="display: block;width: 100%;text-align: center;">
+                    <Upload
+                            action="//111.230.242.177:8999/files"
+                            :show-upload-list="false"
+                            :on-format-error="handleFormatError"
+                            :max-size="204800"
+                            :before-upload="handleBeforeUpload"
+                            :on-progress="handleProgress"
+                            :on-success="handleSuccess"
+                            :on-error="handleError"
+                    >
+                        <span>请选择文件&nbsp;&nbsp;</span>
+                        <Button type="ghost" icon="ios-cloud-upload-outline">上传文件</Button>
+                        <div v-if="currentFile !== null">
+                             {{ currentFile.name }}
+                        </div>
+                    </Upload>
+
+                    <Form ref="newCourseResource" :model="newCourseResource"  :label-width="80">
+                        <div class="resource-desc">
+                            <div class="center">
+                                <div v-if="currentFile !== null">
+                                    <FormItem  prop="desc">
+                                        <Input type="textarea" v-model="newCourseResource.desc" :autosize="{minRows: 3,maxRows: 6}"  placeholder="课件描述" />
+                                    </FormItem>
+                                </div>
+                            </div>
+                        </div>
+                    </Form>
+                </div>
+
+
+            </div>
+        </Modal>
+
 
     </div>
 
 </template>
 
 <script>
-    import {CommentApi, StudentApi, TcApi} from '../../api'
+    import {CommentApi, StudentApi, TcApi, ResourceApi} from '../../api'
     import util from '../../libs/util';
     import {attrList, natureList} from '../../libs/data';
     import Cookies from 'js-cookie';
@@ -425,10 +485,78 @@
                                 )
                             ])
                         }
-                    }]
+                    }],
+
+                // 课件
+                selectCondResource: {
+                    tcid: '',
+                    tid: '',
+                    status: 1,
+                    page: 1,
+                    pageSize: 20,
+                    sort: '-create'
+                },
+                addCourseResourceModal: false,
+                newCourseResource: {},
+                resourceList: [],
+                currentFile: null,
+                resourceColumns: [
+                    {
+                        title: '上传老师',
+                        key: 'teacherName'
+                    },
+                    {
+                        title: '课程名称',
+                        key: 'courseName'
+                    },
+                    {
+                        title: '课件描述',
+                        key: 'desc'
+                    },
+                    {
+                        title: '课件名称',
+                        key: 'fileName'
+                    },
+                    {
+                        title: '上传时间',
+                        key: 'create'
+                    },{
+                        title: '操作',
+                        key: 'action',
+                        width: 200,
+                        align: 'center',
+                        render: (h, params) => {
+                            return h('div', [
+                                h(
+                                    'Button', {
+                                        props: {type: 'primary', size: 'small'},
+                                        style: {marginRight: '5px'},
+                                        on: {
+                                            click: () => {
+                                                this.downloadResource(this.resourceList[params.index].file.id);
+                                            }
+                                        }},
+                                    '下载课件'
+                                ),
+                                h(
+                                    'Button', {
+                                        props: {type: 'error', size: 'small'},
+                                        style: {marginRight: '5px'},
+                                        on: {
+                                            click: () => {
+                                                this.deleteResource([this.resourceList[params.index].id]);
+                                            }
+                                        }},
+                                    '删除课件'
+                                )
+
+                            ])
+                        }
+                    }],
 
             }
         },
+
         methods: {
             doSearch() {
                 switch (this.tabValue) {
@@ -442,6 +570,7 @@
                         this.getAllComment();
                         break;
                     case '3':
+                        this.getAllResources();
                         break;
                 }
             },
@@ -587,6 +716,7 @@
 
             //评论
             getAllComment() {
+                this.selectCondComment.tcid = this.currentId;
                 CommentApi.list(this.selectCondComment).then(({data}) => {
                     if (data.code === this.$code.SUCCESS) {
                         this.commentList = util.safe(data, 'data.commentList', []);
@@ -698,6 +828,121 @@
             },
             getNewChildComment(){
                 this.getAllComment();
+            },
+
+
+            //课件
+            addCourseResourceModalOk(){
+                this.newCourseResource.file = this.currentFile;
+                this.newCourseResource.tcid = this.currentId;
+                ResourceApi.add(this.newCourseResource).then(({data}) => {
+                    if (data.code === this.$code.SUCCESS) {
+                        this.$Message.success('添加成功');
+                        this.addCourseResourceModal = false;
+                        this.currentFile = null;
+                        this.getAllResources();
+                    } else {
+                        return this.$Message.error(data.msg)
+                    }
+                })
+            },
+            changeResourcePage(page){
+                this.selectCondResource.page = page;
+                this.getAllResources();
+            },
+            changeResourcePageSize(size){
+                this.selectCondResource.pageSize = size;
+                this.getAllResources();
+            },
+            getAllResources(){
+                this.selectCondResource.tcid = this.currentId;
+                ResourceApi.list(this.selectCondResource).then(({data}) => {
+                    if (data.code === this.$code.SUCCESS) {
+                        this.resourceList = util.safe(data, 'data.resourceList', []);
+                        for (let i = 0; i < this.resourceList.length; i++){
+                            this.resourceList[i].create = util.formatDateTime(this.resourceList[i].create);
+                            this.resourceList[i].fileName = this.resourceList[i].file.name;
+                        }
+                        this.total = util.safe(data, 'data.total', 0);
+                    } else {
+                        return this.$Message.error(data.msg)
+                    }
+                })
+            },
+
+            deleteResource(ids){
+                ResourceApi.delete(ids).then(({data}) => {
+                    if (data.code === this.$code.SUCCESS) {
+                        this.$Message.success('删除成功');
+                        this.getAllResources();
+                    } else {
+                        return this.$Message.error(data.msg)
+                    }
+                })
+            },
+
+            uploadFile (obj) {
+                var files = obj.target.files || obj.dataTransfer.files;
+                if (files === null || files.length === 0) {
+                    this.addChildCommentModal = false;
+                    return;
+                }
+
+                ResourceApi.upload({file: files[0]}).then(({data}) => {
+                    if (data.code === this.$code.SUCCESS) {
+                        this.$Message.success('上传成功');
+                        this.currentFile = util.safe(data, 'data.file', []);
+                    } else {
+                        return this.$Message.error(data.msg)
+                    }
+                });
+                //重新生成 input 节点
+                this.fileState = false;
+                window.setTimeout(()=>{
+                    this.fileState = true
+                },200);
+
+            },
+            downloadResource(id){
+                window.open('http://111.230.242.177:8999/files/' + id + '?dl=1');
+            },
+
+            addCourseResource(){
+                this.currentFile = null;
+                this.addCourseResourceModal = true;
+            },
+            handleFormatError (file) {
+                this.$Notice.warning({
+                    title: '文件格式不正确',
+                    desc: '文件 ' + file.name + ' 格式不正确，请选择图片文件。'
+                });
+            },
+            handleBeforeUpload (file) {
+                this.$Notice.warning({
+                    title: '文件准备上传',
+                    desc: '文件 ' + file.name + ' 准备上传。'
+                });
+
+            },
+            handleProgress (event, file) {
+                this.$Notice.info({
+                    title: '文件正在上传',
+                    desc: '文件 ' + file.name + ' 正在上传。'
+                });
+            },
+            handleSuccess (response, file) {
+                this.$Notice.success({
+                    title: '文件上传成功',
+                    desc: '文件 ' + file.name + ' 上传成功。'
+                });
+                this.currentFile = response.data.file;
+                this.newCourseResource.file = this.currentFile;
+            },
+            handleError (event, file) {
+                this.$Notice.error({
+                    title: '文件上传失败',
+                    desc: '文件 ' + file.name + ' 上传失败。'
+                });
             },
 
         },
