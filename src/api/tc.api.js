@@ -104,6 +104,15 @@ export default {
             method: 'get'
         })
     },
+
+    listGradeStu(params) {
+        let options = httpUtil.createOption(params);
+        return httpUtil.fetch({
+            url: this.url +'stu/grade/list/' + options,
+            method: 'get'
+        })
+    },
+
     updateStuForTc(data) {
         return httpUtil.fetch({
             url: this.url +'stu/update',

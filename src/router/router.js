@@ -550,6 +550,23 @@ export const appRouter = [{
         }]
     },
     {
+        path: '/student-courses',
+            icon: 'android-sad',
+        title: '我的成绩',
+        name: 'student-grade',
+        component: Main,
+        meta: {
+        roles: [3]
+    },
+        children: [{
+            path: 'listStudentGrade',
+            title: '课程成绩',
+            name: 'list-student-grade',
+            component: () =>
+            import ('@/views/student-page/list-grade.vue')
+        }]
+    },
+    {
         path: '/student-course-detail',
             icon: 'android-sad',
         title: '我的课程详情',
