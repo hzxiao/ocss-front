@@ -150,29 +150,28 @@
         <Modal
                 v-model="updateGradeModel"
                 title="更新成绩"
-                loading
                 @on-ok="updateGradeModelOk()">
             <div class="es">
-                <Form ref="studentGrade" :model="studentGrade"  :label-width="80">
-                    <div class="lrbox">
-                        <div class="left-side">
-                            <FormItem label="" prop="examGrade">
-                                <Input v-model="studentGrade.examGrade"  placeholder="考试成绩"></Input>
-                            </FormItem>
-                        </div>
-                        <div class="left-side">
-                            <FormItem label="" prop="ordinaryGrade">
-                                <Input v-model="studentGrade.ordinaryGrade"  placeholder="平时成绩"></Input>
-                            </FormItem>
-                        </div>
-                        <div class="left-side">
-                            <FormItem label="" prop="grade">
-                                <Input v-model="studentGrade.grade"  placeholder="综合成绩"></Input>
-                            </FormItem>
-                        </div>
+            <Form ref="studentGrade" :model="studentGrade" :label-width="40">
+                <div class="lrbox">
+                    <div class="left-side">
+                        <FormItem  prop="examGrade">
+                            <Input type="textarea" v-model="studentGrade.examGrade" style="width: 90px; height: 35px;" :autosize="{minRows: 1,maxRows: 1}" placeholder="考试成绩"></Input>
+                        </FormItem>
                     </div>
-                </Form>
-            </div>
+                    <div class="left-side">
+                        <FormItem  prop="ordinaryGrade">
+                            <Input type="textarea" v-model="studentGrade.ordinaryGrade" style="width: 90px; height: 35px;" :autosize="{minRows: 1,maxRows: 1}" placeholder="平时成绩" ></Input>
+                        </FormItem>
+                    </div>
+                    <div class="left-side">
+                        <FormItem  prop="grade">
+                            <Input type="textarea" v-model="studentGrade.grade" style="width: 90px; height: 35px;" :autosize="{minRows: 1,maxRows: 1}" placeholder="综合成绩" ></Input>
+                        </FormItem>
+                    </div>
+                </div>
+            </Form>
+        </div>
         </Modal>
 
 
@@ -186,8 +185,8 @@
                 <Form ref="newComment" :model="newComment"  :label-width="80">
                     <div class="lrbox">
                         <div class="left-side">
-                            <FormItem label="评论内容" prop="content">
-                                <Input type="textarea" v-model="newComment.content" :autosize="{minRows: 3,maxRows: 6}"  placeholder="谈谈你对本课程的看看" />
+                            <FormItem prop="content">
+                                <Input type="textarea" v-model="newComment.content" :autosize="{minRows: 3,maxRows: 6}"  placeholder="谈谈你对本课程的看法" />
                             </FormItem>
                         </div>
                     </div>
@@ -203,8 +202,8 @@
                 <Form ref="newChildComment" :model="newChildComment"  :label-width="80">
                     <div class="lrbox">
                         <div class="left-side">
-                            <FormItem label="评论内容" prop="content">
-                                <Input type="textarea" v-model="newChildComment.content" :autosize="{minRows: 3,maxRows: 6}"  placeholder="谈谈你对本课程的看看" />
+                            <FormItem prop="content">
+                                <Input type="textarea" v-model="newChildComment.content" :autosize="{minRows: 3,maxRows: 6}"  placeholder="谈谈你对此评论的看法" />
                             </FormItem>
                         </div>
                     </div>
@@ -250,7 +249,6 @@
                         </div>
                     </Form>
                 </div>
-
 
             </div>
         </Modal>
@@ -312,7 +310,7 @@
                     title: '平时成绩',
                     key: 'ordinaryGrade'
                 },{
-                    title: '成绩',
+                    title: '综合成绩',
                     key: 'grade'
                 },{
                     title: '操作',
@@ -329,7 +327,6 @@
                                         click: () => {
                                             this.studentGrade = this.studentList[params.index];
                                             this.updateStudentGrade();
-//                                            this.$router.push({name: 'teacher-course-detail-tea', params: {id: this.courses[params.index].id}});
                                         }
                                     }},
                                 '更新成绩'
@@ -338,6 +335,12 @@
                     }
                 }],
 
+                gradeRules:{
+                    grade
+                        : [
+                        { type: 'string', max: 6, message: '无效', trigger: 'blur' }
+                    ]
+                },
                 studentGrade:{},
 
                 studentList: [],
@@ -424,17 +427,6 @@
                             return h('div', [
                                 h(
                                     'Button', {
-                                        props: {type: 'error', size: 'small'},
-                                        style: {marginRight: '5px'},
-                                        on: {
-                                            click: () => {
-                                                this.deleteComment([this.commentList[params.index].id]);
-                                            }
-                                        }},
-                                    '删除评论'
-                                ),
-                                h(
-                                    'Button', {
                                         props: {type: 'primary', size: 'small'},
                                         style: {marginRight: '5px'},
                                         on: {
@@ -444,7 +436,18 @@
                                             }
                                         }},
                                     '评论详情'
-                                )
+                                ),
+                                h(
+                                    'Button', {
+                                        props: {type: 'error', size: 'small'},
+                                        style: {marginRight: '5px'},
+                                        on: {
+                                            click: () => {
+                                                this.deleteComment([this.commentList[params.index].id]);
+                                            }
+                                        }},
+                                    '删除评论'
+                                ),
                             ])
                         }
                     }
@@ -553,7 +556,6 @@
                             ])
                         }
                     }],
-
             }
         },
 
@@ -696,22 +698,38 @@
                 this.updateGradeModel = true;
             },
             updateGradeModelOk() {
-                TcApi.updateGradeForTc({tc:
-                    {id:this.currentId,
-                        StuInfo: [{sid:this.studentGrade.id,
-                            examGrade:this.studentGrade.examGrade,
-                            ordinaryGrade:this.studentGrade.ordinaryGrade,
-                            grade:this.studentGrade.grade}]
-                    }
-                }).then(({data}) => {
-                    if (data.code === this.$code.SUCCESS) {
-                        this.$Message.success('修改成功');
-                        this.updateGradeModel = false;
-                        this.doSearch();
-                    } else {
-                        return this.$Message.error(data.msg)
-                    }
-                });
+                if (this.judgeGradeRule()){
+                     this.$Message.error('格式有误');
+                    this.doSearch();
+                }else {
+                    TcApi.updateGradeForTc({tc:
+                        {id:this.currentId,
+                            StuInfo: [{sid:this.studentGrade.id,
+                                examGrade:this.studentGrade.examGrade,
+                                ordinaryGrade:this.studentGrade.ordinaryGrade,
+                                grade:this.studentGrade.grade}]
+                        }
+                    }).then(({data}) => {
+                        if (data.code === this.$code.SUCCESS) {
+                            this.$Message.success('修改成功');
+                            this.updateGradeModel = false;
+                            this.doSearch();
+                        } else {
+                            return this.$Message.error(data.msg)
+                        }
+                    });
+                }
+
+            },
+            //判断成绩格式
+            judgeGradeRule(){
+                return (isNaN(this.studentGrade.examGrade)
+                    || isNaN(this.studentGrade.ordinaryGrade)
+                    || isNaN(this.studentGrade.grade)
+                    || Number(this.studentGrade.examGrade) - 1000 > 0
+                    || Number(this.studentGrade.ordinaryGrade) - 1000 > 0
+                    || Number(this.studentGrade.grade) - 1000 > 0
+                );
             },
 
             //评论
@@ -730,7 +748,7 @@
                         }
                         this.total = util.safe(data, 'data.total', 0);
                         if (this.showChildCommentList){
-                            console.log(this.showChildCommentList);
+//                            console.log(this.showChildCommentList);
                             for (let i = 0; i < this.commentList.length; i++){
                                 if (this.commentList[i].id === this.currentComment.id){
                                     this.currentComment = this.commentList[i];
@@ -842,6 +860,7 @@
                         this.currentFile = null;
                         this.getAllResources();
                     } else {
+                        this.addCourseResourceModal = false;
                         return this.$Message.error(data.msg)
                     }
                 })
@@ -912,10 +931,7 @@
                 this.addCourseResourceModal = true;
             },
             handleFormatError (file) {
-                this.$Notice.warning({
-                    title: '文件格式不正确',
-                    desc: '文件 ' + file.name + ' 格式不正确，请选择图片文件。'
-                });
+               jude
             },
             handleBeforeUpload (file) {
                 this.$Notice.warning({

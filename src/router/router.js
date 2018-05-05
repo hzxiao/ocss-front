@@ -489,13 +489,12 @@ export const appRouter = [{
                 name: 'list-teacher-course-tea',
                 component: () =>
                 import ('@/views/teacher-page/teacher-course.vue')
-            }
-            ,{
-            path: 'listCourse',
-            title: '课程列表',
-            name: 'list-course-tea',
-            component: () =>
-                import ('@/views/teacher-page/list-course.vue')
+            },{
+                path: 'setGrade',
+                title: '成绩管理',
+                name: 'setting-grade',
+                component: () =>
+                import ('@/views/teacher-page/list-grade.vue')
             }]
     },
     {
@@ -515,23 +514,7 @@ export const appRouter = [{
             import ('@/views/teacher-page/teacher-course-detail.vue')
         }]
     },
-    {
-        path: '/grades',
-        icon: 'android-sad',
-        title: '成绩管理',
-        name: 'manage-grade',
-        component: Main,
-        meta: {
-            roles: [2]
-        },
-        children: [{
-            path: 'setGrade',
-            title: '成绩管理',
-            name: 'setting-grade',
-            component: () =>
-                import ('@/views/teacher-page/list-grade.vue')
-        }]
-    },
+
     {
         path: '/student-courses',
         icon: 'android-sad',
@@ -547,18 +530,7 @@ export const appRouter = [{
             name: 'list-student-course',
             component: () =>
                 import ('@/views/student-page/student-course.vue')
-        }]
-    },
-    {
-        path: '/student-courses',
-            icon: 'android-sad',
-        title: '我的成绩',
-        name: 'student-grade',
-        component: Main,
-        meta: {
-        roles: [3]
-    },
-        children: [{
+        },{
             path: 'listStudentGrade',
             title: '课程成绩',
             name: 'list-student-grade',

@@ -7,10 +7,11 @@
 
         <Tabs :value="tabValue" type="card" @on-click="tabsChange" :animated="false">
             <TabPane label="基本信息" name="0">
+
                 <Card class="crs-info-card">
                     <p slot="title">
                         <Icon type="person"></Icon>
-                        选课课程信息
+                        学生信息
                     </p>
                     <div class="info" v-for="item in tcInfo">
                         <span>{{ item.label }}</span>
@@ -160,8 +161,8 @@
                 <Form ref="newComment" :model="newComment"  :label-width="80">
                     <div class="lrbox">
                         <div class="left-side">
-                            <FormItem label="评论内容" prop="content">
-                                <Input type="textarea" v-model="newComment.content" :autosize="{minRows: 3,maxRows: 6}"  placeholder="谈谈你对本课程的看看" />
+                            <FormItem label="" prop="content">
+                                <Input type="textarea" v-model="newComment.content" :autosize="{minRows: 3,maxRows: 6}"  placeholder="谈谈你对本课程的看法" />
                             </FormItem>
                         </div>
                     </div>
@@ -177,8 +178,8 @@
                 <Form ref="newChildComment" :model="newChildComment"  :label-width="80">
                     <div class="lrbox">
                         <div class="left-side">
-                            <FormItem label="评论内容" prop="content">
-                                <Input type="textarea" v-model="newChildComment.content" :autosize="{minRows: 3,maxRows: 6}"  placeholder="谈谈你对本课程的看看" />
+                            <FormItem label="" prop="content">
+                                <Input type="textarea" v-model="newChildComment.content" :autosize="{minRows: 3,maxRows: 6}"  placeholder="谈谈你对此评论的看法" />
                             </FormItem>
                         </div>
                     </div>
@@ -329,17 +330,6 @@
                             return h('div', [
                                 h(
                                     'Button', {
-                                        props: {type: 'error', size: 'small'},
-                                        style: {marginRight: '5px'},
-                                        on: {
-                                            click: () => {
-                                                this.deleteComment([this.commentList[params.index].id]);
-                                            }
-                                        }},
-                                    '删除评论'
-                                ),
-                                h(
-                                    'Button', {
                                         props: {type: 'primary', size: 'small'},
                                         style: {marginRight: '5px'},
                                         on: {
@@ -370,26 +360,6 @@
                     {
                         title: '回复时间',
                         key: 'create'
-                    },{
-                        title: '操作',
-                        key: 'action',
-                        width: 100,
-                        align: 'center',
-                        render: (h, params) => {
-                            return h('div', [
-                                h(
-                                    'Button', {
-                                        props: {type: 'error', size: 'small'},
-                                        style: {marginRight: '5px'},
-                                        on: {
-                                            click: () => {
-                                                this.deleteChildCommentren([this.currentComment.id],[this.currentComment.children[params.index].id]);
-                                            }
-                                        }},
-                                    '删除回复'
-                                )
-                            ])
-                        }
                     }],
 
                 // 课件
@@ -445,6 +415,8 @@
                         }
                     }],
 
+                basicInfoModel: '1',//控制基本信息的折叠面板，初始为1
+
             }
         },
         methods: {
@@ -489,6 +461,8 @@
                         var tc = util.safe(data, 'data.tc', {});
                         var course = util.safe(data, 'data.course', {});
                         var teacher = util.safe(data, 'data.teacher', {});
+                        var student = util.safe(data, 'data.student', {});
+
                         this.tcInfo = [];
                         let tcStudentInfo;
                         let uid = Cookies.get('user');
@@ -499,6 +473,15 @@
                                 }
                             }
                         }
+                        if (tcStudentInfo == null){
+                            student = null;
+                        }
+                        this.tcInfo.push({label: '学号: ', value: student.id});
+                        this.tcInfo.push({label: '姓名: ', value: student.name});
+                        this.tcInfo.push({label: '学院: ', value: student.dept.name});
+                        this.tcInfo.push({label: '专业: ', value: student.major.name});
+                        this.tcInfo.push({label: '年级: ', value: student.schoolYear});
+                        this.tcInfo.push({label: '班级: ', value: student.class});
                         this.tcInfo.push({label: '综合成绩: ', value: tcStudentInfo.grade});
                         this.tcInfo.push({label: '平时成绩: ', value: tcStudentInfo.ordinaryGrade});
                         this.tcInfo.push({label: '考试成绩: ', value: tcStudentInfo.examGrade});
@@ -512,6 +495,7 @@
                         this.courseInfo.push({label: '课程学分: ', value: course.credit});
                         this.courseInfo.push({label: '课程容量: ', value: tc.capacity});
                         this.courseInfo.push({label: '选课余量: ', value: tc.margin});
+                        this.courseInfo.push({label: '选课人数: ', value: tc.capacity - tc.margin});
                         this.courseInfo.push({
                             label: '选课时间: ',
                             value: util.formatDateTime(tc.startSelectTime) + ' - ' + util.formatDateTime(tc.endSelectTime)

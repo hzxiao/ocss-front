@@ -108,7 +108,7 @@ export default {
     listGradeStu(params) {
         let options = httpUtil.createOption(params);
         return httpUtil.fetch({
-            url: this.url +'stu/grade/list/' + options,
+            url: this.url +'stu/grade/list' + options,
             method: 'get'
         })
     },

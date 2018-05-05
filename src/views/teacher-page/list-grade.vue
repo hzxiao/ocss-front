@@ -36,7 +36,7 @@
                 searchText: '',
                 selectCond: {
                     name: '',
-                    selectState: 1,
+                    selectState: 0,
                     page: 1,
                     pageSize: 20,
                     sort: '-create'
