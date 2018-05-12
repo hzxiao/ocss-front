@@ -165,7 +165,7 @@
                                     props: {type: 'primary', size: 'small'}, style: {marginRight: '5px'},
                                     on: {
                                         click: () => {
-                                            this.$router.push({name: 'edit-teacher', params: {id: this.tcList[params.index].id}});
+                                            this.$router.push({name: 'edit-teach-course', params: {id: this.tcList[params.index].id}});
                                         }
                                     }},
                                 '进入编辑'
