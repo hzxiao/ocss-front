@@ -19,14 +19,15 @@
 
             <DatePicker v-else-if="fields.type === 'date'"
                         v-model="fields.model"
+                        type="datetime"
                         @on-change="handleDateChange(fields)"
                         placeholder="选择日期"
                         style="width: 200px"></DatePicker>
 
-            <DatePicker v-else-if="fields.type === 'daterange'"
+            <DatePicker v-else-if="fields.type === 'datetimerange'"
                         v-model="fields.model"
                         @on-change="handleDateChange(fields)"
-                        type="daterange"
+                        type="datetimerange"
                         placeholder="选择日期"
                         style="width: 200px"></DatePicker>
 

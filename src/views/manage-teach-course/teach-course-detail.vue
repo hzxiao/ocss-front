@@ -33,8 +33,7 @@
                     <Button type="default" @click="handleAddStuForTc()">增加学生</Button>
                 </div>
 
-                <Table ref="table" :loading="tableLoading" :data="studentList" :columns="tableColumns"
-                       @on-selection-change="selectionChange" stripe>
+                <Table ref="table" :loading="tableLoading" :data="studentList" :columns="tableColumns" stripe>
                 </Table>
 
             </TabPane>

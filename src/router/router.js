@@ -383,7 +383,7 @@ export const appRouter = [{
                 title: '编辑学生',
                 name: 'edit-student',
                 component: () =>
-                  import ('@/views/manage-student/edit-student.vue')
+                    import ('@/views/manage-student/edit-student.vue')
             }
         ]
     },
@@ -415,7 +415,7 @@ export const appRouter = [{
                 title: '编辑教师',
                 name: 'edit-teacher',
                 component: () =>
-                  import ('@/views/manage-teacher/edit-teacher.vue')
+                    import ('@/views/manage-teacher/edit-teacher.vue')
             }
         ]
     },
@@ -432,19 +432,22 @@ export const appRouter = [{
                 path: 'listCourse',
                 title: '课程列表',
                 name: 'list-course',
-                component: () => import ('@/views/manage-course/list-course.vue')
+                component: () =>
+                    import ('@/views/manage-course/list-course.vue')
             },
             {
                 path: 'addCourse',
                 title: '添加课程',
                 name: 'add-course',
-                component: () => import ('@/views/manage-course/add-course.vue')
+                component: () =>
+                    import ('@/views/manage-course/add-course.vue')
             },
             {
                 path: 'editCourse',
                 title: '编辑课程',
                 name: 'edit-course',
-                component: () => import ('@/views/manage-course/edit-course.vue')
+                component: () =>
+                    import ('@/views/manage-course/edit-course.vue')
             }
         ]
     },
@@ -470,6 +473,13 @@ export const appRouter = [{
                 name: 'add-teach-course',
                 component: () =>
                     import ('@/views/manage-teach-course/add-tc.vue')
+            },
+            {
+                path: 'editTeachCourse',
+                title: '编辑选课',
+                name: 'edit-teach-course',
+                component: () =>
+                    import ('@/views/manage-teach-course/edit-tc.vue')
             }
         ]
     },
@@ -482,36 +492,35 @@ export const appRouter = [{
         meta: {
             roles: [2]
         },
-        children: [
-            {
-                path: 'listTeacherCourse',
-                title: '我的课程',
-                name: 'list-teacher-course-tea',
-                component: () =>
+        children: [{
+            path: 'listTeacherCourse',
+            title: '我的课程',
+            name: 'list-teacher-course-tea',
+            component: () =>
                 import ('@/views/teacher-page/teacher-course.vue')
-            },{
-                path: 'setGrade',
-                title: '成绩管理',
-                name: 'setting-grade',
-                component: () =>
+        }, {
+            path: 'setGrade',
+            title: '成绩管理',
+            name: 'setting-grade',
+            component: () =>
                 import ('@/views/teacher-page/list-grade.vue')
-            }]
+        }]
     },
     {
         path: '/teacher-courses',
-            icon: 'android-sad',
+        icon: 'android-sad',
         title: '我的课程详情',
         name: 'teacher-course',
         component: Main,
         meta: {
-        roles: [5]
-    },
+            roles: [5]
+        },
         children: [{
             path: 'TeacherCourseDetail',
             title: '我的课程详情',
             name: 'teacher-course-detail-tea',
             component: () =>
-            import ('@/views/teacher-page/teacher-course-detail.vue')
+                import ('@/views/teacher-page/teacher-course-detail.vue')
         }]
     },
 
@@ -530,29 +539,29 @@ export const appRouter = [{
             name: 'list-student-course',
             component: () =>
                 import ('@/views/student-page/student-course.vue')
-        },{
+        }, {
             path: 'listStudentGrade',
             title: '课程成绩',
             name: 'list-student-grade',
             component: () =>
-            import ('@/views/student-page/list-grade.vue')
+                import ('@/views/student-page/list-grade.vue')
         }]
     },
     {
         path: '/student-course-detail',
-            icon: 'android-sad',
+        icon: 'android-sad',
         title: '我的课程详情',
         name: 'student-course-detail',
         component: Main,
         meta: {
-        roles: [5]
-    },
+            roles: [5]
+        },
         children: [{
             path: 'StudentCourseDetail',
             title: '我的课程详情',
             name: 'student-course-detail-stu',
             component: () =>
-            import ('@/views/student-page/student-course-detail.vue')
+                import ('@/views/student-page/student-course-detail.vue')
         }]
     },
     {
@@ -586,7 +595,7 @@ export const appRouter = [{
             title: '课程详情',
             name: 'teach-course-detail-adm',
             component: () =>
-              import ('@/views/manage-teach-course/teach-course-detail.vue')
+                import ('@/views/manage-teach-course/teach-course-detail.vue')
         }]
     },
     {
@@ -602,7 +611,7 @@ export const appRouter = [{
             title: 'playground',
             name: '0',
             component: () =>
-                import('@/views/playground/index.vue')
+                import ('@/views/playground/index.vue')
         }]
     }
 ];

@@ -67,6 +67,7 @@
     import oForm from '../../components/o-form'
     import {TcApi, CourseApi, TeacherApi} from '../../api'
     import util from '../../libs/util';
+    import {schoolYearList, termList} from '../../libs/data';
     import {merge, prop, sort, pipe, pluck, flatten, uniq, map, range, filter, compose, not, inc} from 'ramda'
 
     export default {
@@ -103,11 +104,18 @@
                             placeholder: '输入老师学号',
                             required: true,
                         },
-                        credit: {
-                            label: '学分',
-                            type: 'number',
-                            value: 0,
+                        schoolYear: {
+                            label: '学年',
+                            type: 'select',
+                            list: schoolYearList,
+                            value: '',
                             required: true
+                        },
+                        term: {
+                            label: '学期',
+                            type: 'select',
+                            list: termList,
+                            value: ''
                         },
                         capacity: {
                             label: '容量',
@@ -202,6 +210,7 @@
                     if (!valid) {
                         return
                     }
+                    formData.term = parseInt(formData.term);
                     TcApi.create(formData).then(({data}) => {
                         if (data.code === this.$code.SUCCESS) {
                             this.$Message.success('添加成功')
