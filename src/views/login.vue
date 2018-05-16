@@ -39,7 +39,8 @@
 
 <script>
 import Cookies from 'js-cookie';
-import { UserApi } from '../api' 
+import { UserApi, NoticeApi } from '../api'
+import util from '@/libs/util.js';
 
 export default {
     data () {
@@ -77,7 +78,7 @@ export default {
             Cookies.set('password', this.form.password);
             Cookies.set('token', data.user.token);
             Cookies.set('role', data.user.role);
-
+            this.getNotice();
             this.$store.dispatch('login', data)
 
             this.$store.commit('setAvator', 'https://ss1.bdstatic.com/70cFvXSh_Q1YnxGkpoWK1HF6hhy/it/u=3448484253,3685836170&fm=27&gp=0.jpg');
@@ -88,10 +89,19 @@ export default {
             } else {
                 Cookies.set('access', 1);
             }
+            this.$store.commit('clearAllTags');
             this.$router.push({
                 name: 'home_index'
             });
-        }
+        },
+        getNotice(){
+                NoticeApi.count().then(({data}) => {
+                    if (data.code === this.$code.SUCCESS){
+                        Cookies.set('messageCount', util.safe(data, 'data.result.unread', 0));
+                } else {
+                    return this.$Message.error(data.msg);
+                }});
+            },
     }
 };
 </script>

@@ -117,10 +117,13 @@
                                 }
                             }
                             this.courses[i].startEndTime = learnTime;
-
+                            if (this.courses[i].grade != null)
+                                this.courses[i].grade = this.courses[i].grade.toFixed(2);
+                            if (this.courses[i].ordinaryGrade != null)
+                                this.courses[i].ordinaryGrade = this.courses[i].ordinaryGrade.toFixed(2);
+                            if (this.courses[i].examGrade != null)
+                                this.courses[i].examGrade = this.courses[i].examGrade.toFixed(2);
                         }
-
-
                         this.tableLoading = false;
                         this.total = util.safe(data, 'data.total', 0);
                     } else {

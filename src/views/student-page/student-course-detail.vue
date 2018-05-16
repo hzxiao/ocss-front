@@ -42,7 +42,7 @@
             <TabPane label="选课学生" name="1">
 
                 <Table ref="table" :loading="tableLoading" :data="studentList" :columns="tableColumns"
-                       @on-selection-change="selectionChange" stripe>
+                       stripe>
                 </Table>
 
             </TabPane>
@@ -56,7 +56,7 @@
                                     <Button type="primary" shape="circle"  @click="addComment()">发表评论</Button>
                                 </div>
                                 <Table ref="commentList" :columns="commentColumns" :data="commentList"
-                                       :no-data-text="noDataText">
+                                       >
                                     <div slot="footer" style="padding-left:5px">
                                     <Page :total="total" :current="selectCondComment.page"
                                           size="small"
@@ -96,7 +96,7 @@
                                 </div>
                                 <div  class="comment-list-con">
                                     <Table ref="commentChildrenList" :columns="commentChildrenColumns" :data="commentChildrenList"
-                                           :no-data-text="noDataText"></Table>
+                                           ></Table>
                                 </div>
                             </div>
                         </transition>
@@ -108,7 +108,7 @@
             <TabPane label="课件" name="3">
                 <div id="resource">
                     <Table ref="resourceList" :columns="resourceColumns" :data="resourceList"
-                           :no-data-text="noDataText">
+                           >
                         <div slot="footer" style="padding-left:5px">
                             <Page :total="total" :current="selectCondResource.page"
                                   size="small"
@@ -429,6 +429,7 @@
                         this.getStuOfTc();
                         break;
                     case '2':
+                        this.showChildCommentList = false;
                         this.getAllComment();
                         break;
                     case '3':
@@ -520,8 +521,9 @@
                         this.studentList = util.safe(data, 'data.studentList', []);
 
                         for (let i = 0; i < this.studentList.length; i++) {
-                            this.studentList[i].selectTime = util.formatDateTime(this.studentList[i].selectTime);
-
+                            if (this.studentList[i].selectTime != null){
+                                this.studentList[i].selectTime = util.formatDateTime(this.studentList[i].selectTime);
+                            }
                             this.studentList[i].deptName = this.studentList[i].dept.name;
                             this.studentList[i].majorName = this.studentList[i].major.name;
                             this.studentList[i].schoolYear = '20' + this.studentList[i].schoolYear + '级';
@@ -612,10 +614,11 @@
 
             addComment(){
                 this.newComment.tcid = this.currentId;
+                this.newComment.content = '';
                 this.addCommentModal = true;
             },
             addCommentModalOk(){
-                if (this.newComment.content === null || this.newComment.content.length === 0){
+                if (this.newComment.content === ''){
                     this.$Message.error("评论内容不能为空");
                     this.addCommentModal = false;
                     return;
@@ -671,9 +674,10 @@
             },
             addChildComment(){
                 this.addChildCommentModal = true;
+                this.newChildComment.content = '';
             },
             addChildCommentModalOk(){
-                if (this.newChildComment.content === null || this.newChildComment.content.length === 0){
+                if (this.newChildComment.content === ''){
                     this.$Message.error("回复评论内容不能为空");
                     this.addChildCommentModal = false;
                     return;

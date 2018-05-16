@@ -32,7 +32,7 @@
 
 
                 <Table ref="table" :loading="tableLoading" :data="studentList" :columns="tableColumns"
-                       @on-selection-change="selectionChange" stripe>
+                        stripe>
                 </Table>
 
             </TabPane>
@@ -46,7 +46,7 @@
                                     <Button type="primary" shape="circle"  @click="addComment()">发表评论</Button>
                                 </div>
                                 <Table ref="commentList" :columns="commentColumns" :data="commentList"
-                                       :no-data-text="noDataText">
+                                       >
                                     <div slot="footer" style="padding-left:5px">
                                         <Page :total="total" :current="selectCondComment.page"
                                               size="small"
@@ -89,7 +89,7 @@
                                 </div>
                                 <div  class="comment-list-con">
                                     <Table ref="commentChildrenList" :columns="commentChildrenColumns" :data="commentChildrenList"
-                                           :no-data-text="noDataText"></Table>
+                                           ></Table>
                                 </div>
                             </div>
                         </transition>
@@ -106,7 +106,7 @@
                         <Button type="primary" shape="circle"  @click="addCourseResource()">上传课件</Button>
                     </div>
                     <Table ref="resourceList" :columns="resourceColumns" :data="resourceList"
-                           :no-data-text="noDataText">
+                           >
                         <div slot="footer" style="padding-left:5px">
                             <Page :total="total" :current="selectCondResource.page"
                                   size="small"
@@ -569,6 +569,7 @@
                         this.getStuOfTc();
                         break;
                     case '2':
+                        this.showChildCommentList = false;
                         this.getAllComment();
                         break;
                     case '3':
@@ -634,8 +635,9 @@
                         this.studentList = util.safe(data, 'data.studentList', []);
 
                         for (let i = 0; i < this.studentList.length; i++) {
-                            this.studentList[i].selectTime = util.formatDateTime(this.studentList[i].selectTime);
-
+                            if (this.studentList[i].selectTime != null){
+                                this.studentList[i].selectTime = util.formatDateTime(this.studentList[i].selectTime);
+                            }
                             this.studentList[i].deptName = this.studentList[i].dept.name;
                             this.studentList[i].majorName = this.studentList[i].major.name;
                             this.studentList[i].schoolYear = '20' + this.studentList[i].schoolYear + '级';
@@ -699,7 +701,6 @@
             },
             updateGradeModelOk() {
                 if (this.judgeGradeRule()){
-                     this.$Message.error('格式有误');
                     this.doSearch();
                 }else {
                     TcApi.updateGradeForTc({tc:
@@ -723,13 +724,41 @@
             },
             //判断成绩格式
             judgeGradeRule(){
-                return (isNaN(this.studentGrade.examGrade)
-                    || isNaN(this.studentGrade.ordinaryGrade)
-                    || isNaN(this.studentGrade.grade)
-                    || Number(this.studentGrade.examGrade) - 1000 > 0
-                    || Number(this.studentGrade.ordinaryGrade) - 1000 > 0
-                    || Number(this.studentGrade.grade) - 1000 > 0
-                );
+                let flagNull = 0;
+                if (this.studentGrade.examGrade != null){
+                    if(isNaN(this.studentGrade.examGrade) || Number(this.studentGrade.examGrade) - 1000 > 0) {
+                        this.$Message.error('考试成绩格式有误');
+                        return true;
+                    }
+                    flagNull += 1;
+                }
+                if (this.studentGrade.ordinaryGrade != null){
+                    if(isNaN(this.studentGrade.ordinaryGrade) || Number(this.studentGrade.ordinaryGrade) - 1000 > 0) {
+                        this.$Message.error('平时成绩格式有误');
+                        return true;
+                    }
+                    flagNull += 1;
+                }
+                if (this.studentGrade.grade != null){
+                    if(isNaN(this.studentGrade.grade) || Number(this.studentGrade.grade) - 1000 > 0) {
+                        this.$Message.error('综合成绩格式有误');
+                        return true;
+                    }
+                    flagNull += 1;
+                }
+                if (flagNull === 0){
+                    this.$Message.error('更改的成绩不能全为空');
+                    return true;
+                }
+                return false;
+//                return (flagNull === 0
+//                    || isNaN(this.studentGrade.examGrade)
+//                    || isNaN(this.studentGrade.ordinaryGrade)
+//                    || isNaN(this.studentGrade.grade)
+//                    || Number(this.studentGrade.examGrade) - 1000 > 0
+//                    || Number(this.studentGrade.ordinaryGrade) - 1000 > 0
+//                    || Number(this.studentGrade.grade) - 1000 > 0
+//                );
             },
 
             //评论
@@ -767,10 +796,11 @@
 
             addComment(){
                 this.newComment.tcid = this.currentId;
+                this.newComment.content = '';
                 this.addCommentModal = true;
             },
             addCommentModalOk(){
-                if (this.newComment.content === null || this.newComment.content.length === 0){
+                if (this.newComment.content === ''){
                     this.$Message.error("评论内容不能为空");
                     this.addCommentModal = false;
                     return;
@@ -826,9 +856,10 @@
             },
             addChildComment(){
                 this.addChildCommentModal = true;
+                this.newChildComment.content = '';
             },
             addChildCommentModalOk(){
-                if (this.newChildComment.content === null || this.newChildComment.content.length === 0){
+                if (this.newChildComment.content === ''){
                     this.$Message.error("回复评论内容不能为空");
                     this.addChildCommentModal = false;
                     return;

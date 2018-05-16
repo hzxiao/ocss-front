@@ -75,7 +75,7 @@
     import themeSwitch from './main-components/theme-switch/theme-switch.vue';
     import Cookies from 'js-cookie';
     import util from '@/libs/util.js';
-    
+
     export default {
         components: {
             shrinkableMenu,
@@ -128,10 +128,9 @@
                     this.$store.commit('addOpenSubmenu', pathArr[1].name);
                 }
                 this.username = Cookies.get('user');
-                let messageCount = 3;
-                this.messageCount = messageCount.toString();
+                this.messageCount = parseInt(Cookies.get('messageCount'));
                 this.checkTag(this.$route.name);
-                this.$store.commit('setMessageCount', 3);
+                this.$store.commit('setMessageCount', this.messageCount);
             },
             toggleClick () {
                 this.shrink = !this.shrink;
